@@ -1,0 +1,91 @@
+{
+  "_Other-ki1irtxk.js": {
+    "file": "assets/Other-ki1irtxk.js",
+    "name": "Other",
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "_Repairs-aGKh32nK.js": {
+    "file": "assets/Repairs-aGKh32nK.js",
+    "name": "Repairs",
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "_Support-Bojl9It0.js": {
+    "file": "assets/Support-Bojl9It0.js",
+    "name": "Support",
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BNQJgFJB.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.jsx": {
+    "file": "assets/app-DMJ5Vxw6.js",
+    "name": "app",
+    "src": "resources/js/app.jsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/pages/customer/index.jsx",
+      "resources/js/pages/merchant/index.jsx",
+      "resources/js/pages/technician/index.jsx",
+      "resources/js/pages/admin/index.jsx"
+    ],
+    "css": [
+      "assets/app-BNQJgFJB.css"
+    ]
+  },
+  "resources/js/pages/admin/index.jsx": {
+    "file": "assets/admin-DJhdJe5H.js",
+    "name": "admin",
+    "src": "resources/js/pages/admin/index.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Other-ki1irtxk.js",
+      "_Support-Bojl9It0.js",
+      "_Repairs-aGKh32nK.js"
+    ]
+  },
+  "resources/js/pages/customer/index.jsx": {
+    "file": "assets/customer-Ch2TGfiw.js",
+    "name": "customer",
+    "src": "resources/js/pages/customer/index.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Repairs-aGKh32nK.js",
+      "_Support-Bojl9It0.js"
+    ]
+  },
+  "resources/js/pages/merchant/index.jsx": {
+    "file": "assets/merchant-C78kUAOw.js",
+    "name": "merchant",
+    "src": "resources/js/pages/merchant/index.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Other-ki1irtxk.js"
+    ]
+  },
+  "resources/js/pages/technician/index.jsx": {
+    "file": "assets/technician-CUnrs2Kf.js",
+    "name": "technician",
+    "src": "resources/js/pages/technician/index.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Other-ki1irtxk.js",
+      "_Repairs-aGKh32nK.js"
+    ]
+  }
+}

@@ -11,7 +11,27 @@ A local marketplace for mobile phones, accessories and repairs, built first for 
 
 See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the architecture, ER diagram, roles and permissions, API map, workflows, security and milestones. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for production setup and backups.
 
-## Quick start (local)
+## Run without Node.js (PHP only)
+
+The compiled frontend (`public/build`) is committed, so you only need **PHP 8.3+ and Composer**. Node.js is not required to run the app.
+
+```bash
+composer install
+cp .env.example .env && php artisan key:generate
+```
+
+Edit `.env`: set `DB_CONNECTION=sqlite` (and remove or comment out the other `DB_*` lines), `OTP_EXPOSE_CODE=true`, and `QUEUE_CONNECTION=sync`. Then run:
+
+```bash
+touch database/database.sqlite        # Windows: type nul > database\database.sqlite
+php artisan migrate --seed
+php artisan storage:link
+php artisan serve                     # open http://127.0.0.1:8000
+```
+
+You need Node.js only if you change files in `resources/js` or `resources/css`. In that case, run `npm install && npm run build` and commit the updated `public/build`.
+
+## Quick start (local, for frontend development)
 
 ```bash
 composer install
