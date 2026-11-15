@@ -9,7 +9,7 @@ A local marketplace for mobile phones, accessories and repairs, built first for 
 
 **Stack:** Laravel 13 · PHP 8.3 · MySQL · Sanctum · Queues and scheduler · React 18 + React Router · Tailwind CSS 4 · Vite · PWA.
 
-See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the architecture, ER diagram, roles and permissions, API map, workflows, security and milestones. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for production setup and backups.
+See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the architecture, ER diagram, roles and permissions, API map, workflows, security and milestones. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for production setup and backups. **Deploying to Hostinger? Follow [docs/HOSTINGER.md](docs/HOSTINGER.md).**
 
 ## Run without Node.js (PHP only)
 
