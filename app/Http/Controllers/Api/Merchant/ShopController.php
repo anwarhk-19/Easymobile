@@ -7,6 +7,7 @@ use App\Http\Requests\ShopRequest;
 use App\Models\MerchantAgreement;
 use App\Models\Shop;
 use App\Services\FileStore;
+use App\Support\Phone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -82,8 +83,8 @@ class ShopController extends Controller
     {
         $a = Arr::only($data, ['name', 'owner_name', 'phone', 'whatsapp', 'address', 'area_id', 'maps_url', 'latitude', 'longitude',
             'opens_at', 'closes_at', 'open_days', 'description', 'delivery_fee', 'delivery_notes']);
-        $a['phone'] = \App\Support\Phone::normalize($a['phone']);
-        $a['whatsapp'] = \App\Support\Phone::normalize($a['whatsapp'] ?? null) ?? $a['phone'];
+        $a['phone'] = Phone::normalize($a['phone']);
+        $a['whatsapp'] = Phone::normalize($a['whatsapp'] ?? null) ?? $a['phone'];
         $a['pickup_available'] = (bool) ($data['pickup_available'] ?? true);
         $a['delivery_available'] = (bool) ($data['delivery_available'] ?? false);
         $a['delivery_fee'] = $a['delivery_fee'] ?? 0;

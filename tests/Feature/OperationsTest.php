@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminActivityLog;
+use App\Models\Commission;
 use App\Models\Order;
+use App\Models\Review;
 use App\Models\Shop;
 use App\Models\SupportTicket;
 use App\Models\User;
@@ -43,7 +46,7 @@ class OperationsTest extends TestCase
 
         // Pending reviews don't count until approved.
         $this->assertSame(0, $shop->fresh()->rating_count);
-        $review = \App\Models\Review::where('reviewable_type', 'shop')->first();
+        $review = Review::where('reviewable_type', 'shop')->first();
         $this->actingAsUser($this->admin())->postJson("/api/v1/admin/reviews/{$review->id}/moderate", ['status' => 'approved'])->assertOk();
         $this->assertSame(1, $shop->fresh()->rating_count);
         $this->assertSame('4.00', $shop->fresh()->rating_avg);
@@ -89,7 +92,7 @@ class OperationsTest extends TestCase
     public function test_settlement_generation_and_refunds(): void
     {
         $shop = $this->shop();
-        \App\Models\Commission::create(['scope' => 'global', 'type' => 'percentage', 'value' => 10]);
+        Commission::create(['scope' => 'global', 'type' => 'percentage', 'value' => 10]);
         $o1 = $this->completedOrder($shop, null, 1000);
         $o2 = $this->completedOrder($shop, null, 500);
         $admin = $this->admin();
@@ -133,7 +136,7 @@ class OperationsTest extends TestCase
         $this->actingAsUser($admin)->postJson("/api/v1/admin/users/{$customer->id}/suspend", ['reason' => 'Abusive'])->assertOk();
         $this->assertSame('suspended', $customer->fresh()->status);
 
-        $actions = \App\Models\AdminActivityLog::pluck('action')->all();
+        $actions = AdminActivityLog::pluck('action')->all();
         $this->assertEqualsCanonicalizing(['product.suspend', 'shop.suspend', 'shop.reinstate', 'user.suspended'], $actions);
         $this->actingAsUser($admin)->getJson('/api/v1/admin/activity-logs')->assertOk()->assertJsonCount(4, 'data');
     }

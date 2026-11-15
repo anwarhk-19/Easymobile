@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Commission extends Model
 {
     public const SCOPES = ['global', 'category', 'shop'];
+
     public const TYPES = ['percentage', 'flat', 'free'];
 
     protected $guarded = ['id'];

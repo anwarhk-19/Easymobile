@@ -1,9 +1,41 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@source '../views';
+@source '../js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --color-brand-50: #effcf9;
+    --color-brand-100: #c9f5ec;
+    --color-brand-200: #94e9da;
+    --color-brand-500: #14a38b;
+    --color-brand-600: #0d8573;
+    --color-brand-700: #0f6a5e;
+    --color-brand-800: #11554d;
+    --color-brand-900: #0d3b36;
+    --color-accent-50: #fff8ed;
+    --color-accent-100: #ffeed4;
+    --color-accent-500: #f59e0b;
+    --color-accent-600: #d97706;
+    --color-ink: #0f172a;
+}
+
+@layer base {
+    html { -webkit-tap-highlight-color: transparent; }
+    body { @apply bg-slate-50 text-slate-800 antialiased; }
+    :focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
+}
+
+@layer components {
+    .card { @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,.04)]; }
+    .input { @apply block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-[15px] text-slate-900 placeholder:text-slate-400 transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100 focus:outline-none disabled:bg-slate-100; }
+    .label { @apply mb-1.5 block text-sm font-medium text-slate-700; }
+    .chip { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-medium text-slate-700 transition hover:border-brand-500 hover:text-brand-700; }
+    .chip-active { @apply border-brand-600 bg-brand-600 text-white hover:text-white; }
+    .table-wrap { @apply overflow-x-auto; }
+    .table-wrap table { @apply w-full text-left text-sm; }
+    .table-wrap th { @apply whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500; }
+    .table-wrap td { @apply border-b border-slate-100 px-4 py-3 align-top; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Commission;
+use App\Models\Enquiry;
 use App\Models\Order;
 use Tests\TestCase;
 
@@ -28,7 +29,7 @@ class OrderWorkflowTest extends TestCase
             'shop_id' => $shop->id, 'enquiry_id' => $enq->json('enquiry.id'), 'fulfilment' => 'delivery',
             'delivery_address' => 'Jali', 'delivery_area_id' => $shop->area_id, 'items' => [['product_id' => $product->id, 'quantity' => 2]],
         ])->assertCreated()->assertJsonPath('order.status', 'requested')->json('order');
-        $this->assertSame('converted', $enq->json('enquiry.status') === 'new' ? \App\Models\Enquiry::find($enq->json('enquiry.id'))->status : null);
+        $this->assertSame('converted', $enq->json('enquiry.status') === 'new' ? Enquiry::find($enq->json('enquiry.id'))->status : null);
 
         // Merchant cannot confirm before the customer accepts a quotation.
         $this->actingAsUser($merchant)->postJson("/api/v1/merchant/orders/{$order['id']}/confirm")->assertStatus(422);

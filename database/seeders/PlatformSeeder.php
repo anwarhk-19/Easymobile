@@ -14,13 +14,18 @@ class PlatformSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(['email' => env('ADMIN_EMAIL', 'admin@bhatkalmobilehub.in')], [
-            'name' => 'Platform Admin', 'role' => 'admin', 'status' => 'active',
-            'password' => env('ADMIN_PASSWORD', 'ChangeMe@2026'),
-        ]);
-        User::updateOrCreate(['email' => 'support@bhatkalmobilehub.in'], [
-            'name' => 'Support Desk', 'role' => 'support', 'status' => 'active', 'password' => env('SUPPORT_PASSWORD', 'Support@2026'),
-        ]);
+        $adminPassword = env('ADMIN_PASSWORD') ?: null;
+        if (app()->isProduction() && ! $adminPassword) {
+            throw new \RuntimeException('Set ADMIN_PASSWORD in .env before seeding production.');
+        }
+        $adminEmail = env('ADMIN_EMAIL') ?: 'admin@bhatkalmobilehub.in';
+        if (! User::where('email', $adminEmail)->exists()) {
+            User::create(['email' => $adminEmail, 'name' => 'Platform Admin', 'role' => 'admin', 'status' => 'active', 'password' => $adminPassword ?? 'ChangeMe@2026']);
+        }
+        // Demo support operator only outside production; create real operators from Admin → Users.
+        if (! app()->isProduction() && ! User::where('email', 'support@bhatkalmobilehub.in')->exists()) {
+            User::create(['email' => 'support@bhatkalmobilehub.in', 'name' => 'Support Desk', 'role' => 'support', 'status' => 'active', 'password' => 'Support@2026']);
+        }
 
         // Pilot: free listings for everyone, small per-order commission on smartphones only.
         Commission::firstOrCreate(['scope' => 'global'], ['type' => 'free', 'value' => 0, 'is_active' => true, 'notes' => 'Pilot: free merchant listings']);

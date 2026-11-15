@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Role extends Model
 {
     public const CUSTOMER = 'customer';
+
     public const MERCHANT = 'merchant';
+
     public const TECHNICIAN = 'technician';
+
     public const ADMIN = 'admin';
+
     public const SUPPORT = 'support';
 
     protected $guarded = ['id'];

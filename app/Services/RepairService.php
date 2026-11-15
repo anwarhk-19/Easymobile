@@ -6,6 +6,7 @@ use App\Exceptions\WorkflowException;
 use App\Models\RepairQuotation;
 use App\Models\RepairRequest;
 use App\Models\RepairStatusHistory;
+use App\Models\RepairWarranty;
 use App\Models\TechnicianProfile;
 use App\Models\User;
 use App\Support\Reference;
@@ -213,7 +214,7 @@ class RepairService
             $days = (int) $quote->warranty_days;
             if ($days > 0) {
                 $r->warranty()->create([
-                    'warranty_code' => Reference::make('WAR', \App\Models\RepairWarranty::class, 'warranty_code'),
+                    'warranty_code' => Reference::make('WAR', RepairWarranty::class, 'warranty_code'),
                     'starts_at' => now()->toDateString(),
                     'ends_at' => now()->addDays($days)->toDateString(),
                     'terms' => $r->technician->warranty_terms,

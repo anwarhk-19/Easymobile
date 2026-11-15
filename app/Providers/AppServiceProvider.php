@@ -2,13 +2,27 @@
 
 namespace App\Providers;
 
+use App\Models\Area;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Commission;
+use App\Models\NotificationTemplate;
+use App\Models\Order;
+use App\Models\PhoneModel;
 use App\Models\Product;
+use App\Models\Refund;
+use App\Models\RepairCategory;
+use App\Models\RepairRequest;
+use App\Models\Review;
+use App\Models\Setting;
+use App\Models\Settlement;
 use App\Models\Shop;
+use App\Models\SupportTicket;
 use App\Models\TechnicianProfile;
+use App\Models\User;
 use App\Services\Sms\LogSmsSender;
 use App\Services\Sms\SmsSender;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -31,21 +45,21 @@ class AppServiceProvider extends ServiceProvider
             'shop' => Shop::class,
             'technician' => TechnicianProfile::class,
             'product' => Product::class,
-            'user' => \App\Models\User::class,
-            'order' => \App\Models\Order::class,
-            'repair' => \App\Models\RepairRequest::class,
-            'review' => \App\Models\Review::class,
-            'ticket' => \App\Models\SupportTicket::class,
-            'settlement' => \App\Models\Settlement::class,
-            'refund' => \App\Models\Refund::class,
-            'commission' => \App\Models\Commission::class,
-            'category' => \App\Models\Category::class,
-            'brand' => \App\Models\Brand::class,
-            'phone_model' => \App\Models\PhoneModel::class,
-            'area' => \App\Models\Area::class,
-            'repair_category' => \App\Models\RepairCategory::class,
-            'notification_template' => \App\Models\NotificationTemplate::class,
-            'setting' => \App\Models\Setting::class,
+            'user' => User::class,
+            'order' => Order::class,
+            'repair' => RepairRequest::class,
+            'review' => Review::class,
+            'ticket' => SupportTicket::class,
+            'settlement' => Settlement::class,
+            'refund' => Refund::class,
+            'commission' => Commission::class,
+            'category' => Category::class,
+            'brand' => Brand::class,
+            'phone_model' => PhoneModel::class,
+            'area' => Area::class,
+            'repair_category' => RepairCategory::class,
+            'notification_template' => NotificationTemplate::class,
+            'setting' => Setting::class,
         ]);
 
         RateLimiter::for('api', fn (Request $r) => Limit::perMinute(120)->by($r->user()?->id ?: $r->ip()));

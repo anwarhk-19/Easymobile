@@ -9,18 +9,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     public const REQUESTED = 'requested';         // customer order request — NOT a confirmed order
+
     public const QUOTED = 'quoted';               // merchant confirmed model/variant/colour/price/delivery
+
     public const ACCEPTED = 'accepted';           // customer accepted the final quotation
+
     public const CONFIRMED = 'confirmed';         // merchant confirmed the order
+
     public const READY = 'ready';                 // ready for pickup / out for delivery
+
     public const HANDED_OVER = 'handed_over';     // delivered or collected
+
     public const COMPLETED = 'completed';         // customer confirmed receipt
+
     public const CANCELLED = 'cancelled';
+
     public const REJECTED = 'rejected';           // merchant could not fulfil (e.g. unavailable)
 
     public const OPEN_STATUSES = [self::REQUESTED, self::QUOTED, self::ACCEPTED, self::CONFIRMED, self::READY, self::HANDED_OVER];
 
     public const PAYMENT_METHODS = ['cod', 'pickup_payment', 'upi'];
+
     public const PAYMENT_STATUSES = ['pending', 'paid', 'partially_refunded', 'refunded'];
 
     protected $guarded = ['id'];

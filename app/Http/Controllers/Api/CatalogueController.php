@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Area;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\PhoneModel;
 use App\Models\Product;
 use App\Models\RepairCategory;
+use App\Models\RepairRequest;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Models\Shop;
+use App\Models\SupportTicket;
 use App\Models\TechnicianProfile;
 use App\Services\SearchService;
 use App\Services\WhatsAppLinkBuilder;
@@ -41,10 +44,10 @@ class CatalogueController extends Controller
             ],
             'enums' => [
                 'availability' => Product::AVAILABILITY,
-                'parts_types' => \App\Models\RepairRequest::PARTS_TYPES,
-                'service_modes' => \App\Models\RepairRequest::SERVICE_MODES,
-                'ticket_categories' => \App\Models\SupportTicket::CATEGORIES,
-                'payment_methods' => \App\Models\Order::PAYMENT_METHODS,
+                'parts_types' => RepairRequest::PARTS_TYPES,
+                'service_modes' => RepairRequest::SERVICE_MODES,
+                'ticket_categories' => SupportTicket::CATEGORIES,
+                'payment_methods' => Order::PAYMENT_METHODS,
             ],
         ]);
     }

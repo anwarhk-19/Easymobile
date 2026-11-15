@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\PhoneModel;
 use App\Models\Product;
 use App\Models\RepairCategory;
+use App\Models\SearchLog;
 use App\Models\Shop;
 use App\Models\TechnicianProfile;
 use App\Models\User;
@@ -236,7 +237,7 @@ class SampleMarketplaceSeeder extends Seeder
 
         // Search logs, including one with no results.
         foreach ([['type c charger', 6], ['iphone 15 cover', 2], ['nokia 3310 battery', 0], ['galaxy a35 glass', 2], ['pixel 8 back cover', 0]] as [$q, $n]) {
-            \App\Models\SearchLog::create(['query' => $q, 'type' => 'all', 'results_count' => $n, 'created_at' => now()->subDays(rand(0, 6))]);
+            SearchLog::create(['query' => $q, 'type' => 'all', 'results_count' => $n, 'created_at' => now()->subDays(rand(0, 6))]);
         }
     }
 }

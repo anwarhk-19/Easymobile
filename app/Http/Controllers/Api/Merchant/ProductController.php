@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Merchant;
 
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Services\FileStore;
 use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,7 @@ class ProductController extends MerchantController
             match ($request->input('status')) {
                 'out_of_stock' => $q->where('availability', 'out_of_stock'),
                 'suspended' => $q->where('is_suspended', true),
-                'stale' => $q->where(fn ($s) => $s->whereNull('stock_confirmed_at')->orWhere('stock_confirmed_at', '<', now()->subDays((int) \App\Models\Setting::get('stock_stale_days')))),
+                'stale' => $q->where(fn ($s) => $s->whereNull('stock_confirmed_at')->orWhere('stock_confirmed_at', '<', now()->subDays((int) Setting::get('stock_stale_days')))),
                 default => $q->where('status', $request->input('status')),
             };
         }

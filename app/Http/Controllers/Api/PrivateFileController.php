@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\RepairImage;
+use App\Models\RepairRequest;
 use App\Models\ShopDocument;
 use App\Models\SupportAttachment;
+use App\Models\SupportTicket;
 use App\Models\TechnicianDocument;
 use App\Services\AuditLogger;
 use Illuminate\Http\Request;
@@ -18,14 +20,14 @@ class PrivateFileController extends Controller
 {
     public function repairImage(Request $request, RepairImage $image): StreamedResponse
     {
-        Gate::authorize('view', \App\Models\RepairRequest::findOrFail($image->repair_request_id));
+        Gate::authorize('view', RepairRequest::findOrFail($image->repair_request_id));
 
         return Storage::disk('local')->response($image->path);
     }
 
     public function ticketAttachment(Request $request, SupportAttachment $attachment): StreamedResponse
     {
-        Gate::authorize('view', \App\Models\SupportTicket::findOrFail($attachment->support_ticket_id));
+        Gate::authorize('view', SupportTicket::findOrFail($attachment->support_ticket_id));
 
         return Storage::disk('local')->download($attachment->path, $attachment->original_name);
     }

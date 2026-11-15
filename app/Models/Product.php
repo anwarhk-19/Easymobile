@@ -16,7 +16,9 @@ class Product extends Model
     use SoftDeletes;
 
     public const AVAILABILITY = ['in_stock', 'limited', 'out_of_stock', 'on_order'];
+
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_INACTIVE = 'inactive';
 
     protected $guarded = ['id'];

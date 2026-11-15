@@ -15,6 +15,7 @@ class SupportTicket extends Model
     public const ESCALATE_CATEGORIES = ['fraud', 'safety_concern', 'privacy_violation', 'seller_misconduct'];
 
     public const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
+
     public const STATUSES = ['open', 'acknowledged', 'in_progress', 'escalated', 'resolved', 'closed'];
 
     protected $guarded = ['id'];

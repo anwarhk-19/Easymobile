@@ -10,20 +10,33 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class RepairRequest extends Model
 {
     public const SUBMITTED = 'submitted';
+
     public const ACCEPTED = 'accepted';
+
     public const REJECTED = 'rejected';
+
     public const DIAGNOSING = 'diagnosing';
+
     public const QUOTED = 'quoted';                 // awaiting customer approval (initial or revised)
+
     public const QUOTE_REJECTED = 'quote_rejected';
+
     public const APPROVED = 'approved';
+
     public const IN_PROGRESS = 'in_progress';
+
     public const TESTING = 'testing';
+
     public const READY = 'ready_for_handover';
+
     public const COMPLETED = 'completed';
+
     public const CANCELLED = 'cancelled';
 
     public const SERVICE_MODES = ['walk_in', 'pickup_drop', 'onsite'];
+
     public const PARTS_TYPES = ['original', 'oem_compatible', 'refurbished', 'aftermarket'];
+
     public const OPEN_STATUSES = [self::SUBMITTED, self::ACCEPTED, self::DIAGNOSING, self::QUOTED, self::APPROVED, self::IN_PROGRESS, self::TESTING, self::READY];
 
     protected $guarded = ['id'];

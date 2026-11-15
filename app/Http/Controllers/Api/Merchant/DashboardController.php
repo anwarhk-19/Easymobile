@@ -6,6 +6,7 @@ use App\Models\Enquiry;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class DashboardController extends MerchantController
         $shop = $this->shop($request);
         $products = Product::where('shop_id', $shop->id);
         $orders = Order::where('shop_id', $shop->id);
-        $staleDays = (int) \App\Models\Setting::get('stock_stale_days');
+        $staleDays = (int) Setting::get('stock_stale_days');
 
         return response()->json([
             'shop' => $shop->only(['id', 'name', 'slug', 'status', 'rejection_reason', 'rating_avg', 'rating_count']),

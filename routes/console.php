@@ -6,8 +6,8 @@ use App\Models\Setting;
 use App\Models\Shop;
 use App\Notifications\PlatformNotification;
 use App\Services\SupportService;
-use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('bmh:escalate-tickets', function (SupportService $support) {
     $this->info('Escalated '.$support->escalateOverdue().' overdue ticket(s).');

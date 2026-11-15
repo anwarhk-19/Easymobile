@@ -10,6 +10,7 @@ use App\Models\PhoneModel;
 use App\Models\RepairCategory;
 use App\Services\AuditLogger;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -55,7 +56,7 @@ class TaxonomyController extends Controller
         $data = $request->validate($this->rules($type));
         $data['slug'] = $this->slug($class, $type === 'phone-models' ? (Brand::find($data['brand_id'])?->name.' '.$data['name']) : $data['name']);
         $item = $class::create($data);
-        AuditLogger::log("taxonomy.created", $item, "Created {$type} entry: {$item->name}");
+        AuditLogger::log('taxonomy.created', $item, "Created {$type} entry: {$item->name}");
 
         return response()->json(['item' => $item], 201);
     }
@@ -65,7 +66,7 @@ class TaxonomyController extends Controller
         $item = $this->class($type)::findOrFail($id);
         $data = $request->validate($this->rules($type, $item));
         $item->update($data);
-        AuditLogger::log("taxonomy.updated", $item, "Updated {$type} entry: {$item->name}", ['changes' => $item->getChanges()]);
+        AuditLogger::log('taxonomy.updated', $item, "Updated {$type} entry: {$item->name}", ['changes' => $item->getChanges()]);
 
         return response()->json(['item' => $item]);
     }
@@ -75,10 +76,10 @@ class TaxonomyController extends Controller
         $item = $this->class($type)::findOrFail($id);
         try {
             $item->delete();
-        } catch (\Illuminate\Database\QueryException) {
+        } catch (QueryException) {
             return response()->json(['message' => 'This entry is in use. Deactivate it instead of deleting.'], 422);
         }
-        AuditLogger::log("taxonomy.deleted", null, "Deleted {$type} entry: {$item->name}", ['id' => $id]);
+        AuditLogger::log('taxonomy.deleted', null, "Deleted {$type} entry: {$item->name}", ['id' => $id]);
 
         return response()->json(['message' => 'Deleted.']);
     }
