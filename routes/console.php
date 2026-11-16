@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Str;
 
 Artisan::command('bmh:escalate-tickets', function (SupportService $support) {
     $this->info('Escalated '.$support->escalateOverdue().' overdue ticket(s).');
@@ -90,6 +92,23 @@ Artisan::command('bmh:doctor', function () {
         $check('API responds internally (GET /api/v1/meta → '.$res->getStatusCode().')', $res->getStatusCode() === 200, 'See the error in storage/logs/laravel.log (tail -50 storage/logs/laravel.log).');
     } catch (Throwable $e) {
         $check('API responds internally', false, $e->getMessage());
+    }
+
+    // Request the API through the real web server (domain → .htaccess → PHP), exactly like the browser does.
+    $base = rtrim((string) config('app.url'), '/');
+    if (str_starts_with($base, 'http') && ! str_contains($base, 'localhost') && ! str_contains($base, '127.0.0.1')) {
+        foreach (['/', '/api/v1/meta'] as $path) {
+            try {
+                $r = Http::timeout(15)->withHeaders(['Accept' => 'application/json'])->withoutRedirecting()->get($base.$path);
+                $type = (string) $r->header('Content-Type');
+                $good = $path === '/' ? $r->status() === 200 && str_contains($type, 'text/html') : $r->status() === 200 && str_contains($type, 'application/json');
+                $check("Public URL {$base}{$path} → HTTP {$r->status()} ({$type})", $good,
+                    ($r->header('Location') ? 'Redirects to '.$r->header('Location').' — APP_URL/domain or https redirect mismatch. ' : '')
+                    .'Server returned: '.Str::limit(preg_replace('/\s+/', ' ', strip_tags($r->body())), 300));
+            } catch (Throwable $e) {
+                $check("Public URL {$base}{$path}", false, 'Request failed: '.$e->getMessage().' — check the domain/subdomain DNS, SSL certificate and that it points at this folder.');
+            }
+        }
     }
 
     $this->newLine();
