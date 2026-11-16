@@ -99,6 +99,15 @@ Never set `OTP_EXPOSE_CODE=true` on a public site. It would let anyone sign in a
 php artisan bmh:doctor
 ```
 
+**Live logs over SSH.** This works even when the website itself is down:
+
+```bash
+php artisan bmh:logs                      # last 50 entries
+php artisan bmh:logs -f                   # follow live (Ctrl+C to stop)
+php artisan bmh:logs -f --level=error     # only errors and worse
+php artisan bmh:logs --grep=SQLSTATE --trace --lines=200
+```
+
 **Reading errors:**
 - Once the site works, admins can read errors in **Admin → System logs**. That page can filter by level, search, show stack traces, download and clear the log.
 - If the API is down, that page can't load. Read the log over SSH instead: `tail -100 storage/logs/laravel.log`.
