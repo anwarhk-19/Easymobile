@@ -4,6 +4,7 @@ import { AdminDashboard, Listings, Users, UserDetail, Verification, Verification
 import { AdminOrderDetail, AdminOrders, AdminRepairDetail, AdminRepairs, AdminTicketDetail, AdminTickets } from './Operations';
 import { Commissions, Refunds, Reviews, Settlements } from './Finance';
 import { ActivityLogs, Catalogue, Reports, SearchInsights, Settings, Templates } from './System';
+import SystemLogs from './SystemLogs';
 
 export default function AdminRoutes() {
     return (
@@ -32,6 +33,7 @@ export default function AdminRoutes() {
             <Route path="searches" element={<SearchInsights />} />
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="system-logs" element={<SystemLogs />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

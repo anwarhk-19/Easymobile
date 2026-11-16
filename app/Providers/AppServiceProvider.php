@@ -26,6 +26,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,9 +43,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Behind Hostinger's HTTPS (and any CDN) make generated URLs and asset links use https.
         if (str_starts_with((string) config('app.url'), 'https://')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
-
 
         Relation::enforceMorphMap([
             'shop' => Shop::class,

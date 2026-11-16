@@ -45,7 +45,11 @@ export async function api(path, { method = 'GET', body, params, form = false, si
         res = await fetch(url, { method, headers, body: payload, signal });
     } catch (e) {
         if (e.name === 'AbortError') throw e;
-        throw new ApiError('You appear to be offline. Check your connection and try again.', 0);
+        // A network-level failure: no HTTP response reached the browser.
+        const msg = navigator.onLine === false
+            ? 'You appear to be offline. Check your connection and try again.'
+            : `Couldn't reach the server (${url.pathname}). If this keeps happening, the site's API isn't responding — please contact support.`;
+        throw new ApiError(msg, 0);
     }
     const data = res.status === 204 ? {} : await res.json().catch(() => ({}));
     if (!res.ok) {

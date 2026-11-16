@@ -93,6 +93,19 @@ Never set `OTP_EXPOSE_CODE=true` on a public site. It would let anyone sign in a
 
 ## Troubleshooting
 
+**Run the health check first.** It checks PHP, `.env`, the database, migrations, folder permissions, the storage link, the built frontend, and whether the API answers. Each problem it finds comes with the fix:
+
+```bash
+php artisan bmh:doctor
+```
+
+**Reading errors:**
+- Once the site works, admins can read errors in **Admin → System logs**. That page can filter by level, search, show stack traces, download and clear the log.
+- If the API is down, that page can't load. Read the log over SSH instead: `tail -100 storage/logs/laravel.log`.
+
+**The app says "Couldn't reach the server":** open `https://YOUR-DOMAIN/api/v1/meta` directly in a browser. You should see JSON. Anything else (an error page, a blank page, or a download prompt) shows where the problem is. Then run `php artisan bmh:doctor`.
+
+
 | Symptom | Fix |
 |---|---|
 | 500 error | Check `storage/logs/laravel.log`. Usually a missing `.env`, an empty `APP_KEY`, wrong DB credentials, or Composer was never run. Run `bash deploy.sh`. |

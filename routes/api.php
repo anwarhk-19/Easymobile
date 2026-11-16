@@ -193,6 +193,11 @@ Route::prefix('v1')->group(function () {
             Route::put('settings', [Admin\SystemController::class, 'updateSettings']);
             Route::get('activity-logs', [Admin\SystemController::class, 'activityLogs']);
             Route::get('search-logs', [Admin\SystemController::class, 'searchLogs']);
+
+            Route::get('system-logs', [Admin\LogController::class, 'files']);
+            Route::get('system-logs/{file}', [Admin\LogController::class, 'show'])->where('file', '[A-Za-z0-9._-]+');
+            Route::get('system-logs/{file}/download', [Admin\LogController::class, 'download'])->where('file', '[A-Za-z0-9._-]+');
+            Route::delete('system-logs/{file}', [Admin\LogController::class, 'clear'])->where('file', '[A-Za-z0-9._-]+');
         });
     });
 });
