@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import '../css/app.css';
 import { AuthProvider } from './lib/auth';
+import { BASE } from './lib/api';
 import { ToastProvider } from './lib/toast';
 import { Loading } from './components/ui';
 import { PortalLayout, PublicLayout, RequireAuth } from './components/layouts';
@@ -57,7 +58,7 @@ function App() {
 }
 
 createRoot(document.getElementById('app')).render(
-    <BrowserRouter>
+    <BrowserRouter basename={BASE || undefined}>
         <AuthProvider>
             <ToastProvider>
                 <App />
@@ -67,5 +68,5 @@ createRoot(document.getElementById('app')).render(
 );
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    window.addEventListener('load', () => navigator.serviceWorker.register(`${BASE}/sw.js`, { scope: `${BASE}/` }).catch(() => {}));
 }

@@ -284,7 +284,7 @@ function ProfileForm({ profile, reload }) {
                     </div>
                 </Section>
                 <Section title="Verification documents">
-                    {p?.documents?.length > 0 && <ul className="mb-3 flex flex-wrap gap-2">{p.documents.map((d) => <li key={d.id}><button type="button" className="chip" onClick={() => openPrivate(`/api/v1/technician-documents/${d.id}`)}>{label(d.type)} · {d.original_name}</button></li>)}</ul>}
+                    {p?.documents?.length > 0 && <ul className="mb-3 flex flex-wrap gap-2">{p.documents.map((d) => <li key={d.id}><button type="button" className="chip" onClick={() => openPrivate(`/technician-documents/${d.id}`)}>{label(d.type)} · {d.original_name}</button></li>)}</ul>}
                     <DocumentsInput docs={values.documents} onChange={set('documents')} types={['id_proof', 'certificate', 'shop_licence', 'address_proof', 'other']} />
                     {!p && <Checkbox className="mt-4" label="I agree to the technician agreement: transparent quotations, no work without approval, and no access to customer data beyond what the repair requires." checked={values.accept_agreement} onChange={set('accept_agreement')} />}
                     {e.accept_agreement && <p className="mt-1 text-xs text-red-600">{e.accept_agreement[0]}</p>}

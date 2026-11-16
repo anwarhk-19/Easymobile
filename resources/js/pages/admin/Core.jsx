@@ -109,7 +109,7 @@ export function VerificationDetail({ kind }) {
                             <div className="space-y-4">
                                 <Section title="Account owner"><DL items={[['Name', owner?.name], ['Phone', owner?.phone], ['Account status', <StatusBadge key="s" status={owner?.status} />]]} /><Button as={Link} size="sm" variant="secondary" className="mt-3" to={`/admin/users/${owner?.id}`}>Manage account</Button></Section>
                                 <Section title="Verification documents">
-                                    {x.documents?.length ? <ul className="space-y-2">{x.documents.map((doc) => <li key={doc.id}><button className="chip" onClick={() => openPrivate(`/api/v1/${isShop ? 'shop' : 'technician'}-documents/${doc.id}`)}>{label(doc.type)} · {doc.original_name}</button></li>)}</ul> : <p className="text-sm text-amber-700">No documents uploaded.</p>}
+                                    {x.documents?.length ? <ul className="space-y-2">{x.documents.map((doc) => <li key={doc.id}><button className="chip" onClick={() => openPrivate(`/${isShop ? 'shop' : 'technician'}-documents/${doc.id}`)}>{label(doc.type)} · {doc.original_name}</button></li>)}</ul> : <p className="text-sm text-amber-700">No documents uploaded.</p>}
                                     <p className="mt-2 text-xs text-slate-500">Document views are recorded in the audit log.</p>
                                 </Section>
                                 {x.photos?.length > 0 && <Section title="Photos"><div className="flex flex-wrap gap-2">{x.photos.map((p) => <img key={p.id} src={p.url} alt="" className="h-20 w-20 rounded-xl object-cover" />)}</div></Section>}

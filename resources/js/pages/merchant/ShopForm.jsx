@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Async, Badge, Button, Checkbox, Field, FileDrop, Input, PageHeader, Section, Select, StatusBadge, Textarea } from '../../components/ui';
-import { del, post, tokenStore } from '../../lib/api';
+import { del, fetchPrivate, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { useAction, useApi, useForm, useMeta } from '../../lib/hooks';
 import { useToast } from '../../lib/toast';
@@ -33,11 +33,12 @@ export function DocumentsInput({ docs, onChange, types = DOC_TYPES }) {
     );
 }
 
-export async function openPrivate(url) {
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${tokenStore.get()}` } });
-    if (!res.ok) return;
-    const blobUrl = URL.createObjectURL(await res.blob());
-    window.open(blobUrl, '_blank', 'noopener');
+/** Opens a private, token-protected file (e.g. a verification document). `path` is relative to /api/v1. */
+export async function openPrivate(path) {
+    try {
+        const blobUrl = URL.createObjectURL(await fetchPrivate(path));
+        window.open(blobUrl, '_blank', 'noopener');
+    } catch { /* not authorised or missing */ }
 }
 
 export default function ShopForm() {
@@ -115,7 +116,7 @@ function ShopFormInner({ data, reload }) {
                     </div>
                 </Section>
                 <Section title="Business verification">
-                    {shop?.documents?.length > 0 && <ul className="mb-3 flex flex-wrap gap-2">{shop.documents.map((d) => <li key={d.id}><button type="button" className="chip" onClick={() => openPrivate(`/api/v1/shop-documents/${d.id}`)}>{label(d.type)} · {d.original_name}</button></li>)}</ul>}
+                    {shop?.documents?.length > 0 && <ul className="mb-3 flex flex-wrap gap-2">{shop.documents.map((d) => <li key={d.id}><button type="button" className="chip" onClick={() => openPrivate(`/shop-documents/${d.id}`)}>{label(d.type)} · {d.original_name}</button></li>)}</ul>}
                     <DocumentsInput docs={values.documents} onChange={set('documents')} />
                     {e.documents && <p className="mt-2 text-xs font-medium text-red-600">{e.documents[0]}</p>}
                     {!shop && <Checkbox className="mt-4" label="I confirm the details are accurate and agree to the merchant listing agreement (genuine products, honest pricing, timely response to customers)." checked={!!values.accept_agreement} onChange={set('accept_agreement')} />}

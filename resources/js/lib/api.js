@@ -1,5 +1,18 @@
 const TOKEN_KEY = 'bmh_token';
 
+/** Install path from the page shell: "" at a domain root, "/easymobile" when deployed in a sub-folder. */
+export const BASE = (document.querySelector('meta[name="app-base"]')?.content || '').replace(/\/+$/, '');
+
+/** Absolute same-origin URL for an API path, e.g. apiUrl('/shop-documents/3') → "/easymobile/api/v1/shop-documents/3". */
+export const apiUrl = (path) => `${BASE}/api/v1${path}`;
+
+/** Downloads/opens a private file that needs the auth token. */
+export async function fetchPrivate(path) {
+    const res = await fetch(apiUrl(path), { headers: { Authorization: `Bearer ${tokenStore.get()}`, Accept: '*/*' } });
+    if (!res.ok) throw new Error('File could not be loaded.');
+    return res.blob();
+}
+
 export const tokenStore = {
     get: () => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } },
     set: (t) => { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch { /* private mode */ } },
@@ -28,7 +41,7 @@ export function toFormData(obj, form = new FormData(), prefix = '') {
 }
 
 export async function api(path, { method = 'GET', body, params, form = false, signal } = {}) {
-    const url = new URL(`/api/v1${path}`, window.location.origin);
+    const url = new URL(apiUrl(path), window.location.origin);
     if (params) Object.entries(params).forEach(([k, v]) => v !== undefined && v !== null && v !== '' && url.searchParams.set(k, v));
 
     const headers = { Accept: 'application/json' };

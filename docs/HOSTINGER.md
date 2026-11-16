@@ -2,6 +2,17 @@
 
 The repository is set up to run on Hostinger shared/cloud hosting **without Node.js**: the compiled frontend (`public/build`) is committed, and a root `.htaccess` sends every request into Laravel's `public/` folder.
 
+## Where to install: domain root or a folder
+
+The app works in either place, with the same code:
+
+| Install path in hPanel → Git | Site address | `APP_URL` in `.env` |
+|---|---|---|
+| *(empty)* → `public_html` | `https://devpulsetech.com` | `https://devpulsetech.com` |
+| `easymobile` → `public_html/easymobile` | `https://devpulsetech.com/easymobile` | `https://devpulsetech.com/easymobile` |
+
+If your main website already uses `devpulsetech.com`, install into a folder such as **`easymobile`** so the two sites don't overwrite each other. `APP_URL` **must include the folder**, otherwise image links break. The app detects the folder automatically for its pages, API calls and assets. The API is always at `<site address>/api/v1/...`; no separate subdomain is needed.
+
 ## 1. One-time hPanel setup
 
 1. **PHP version** — hPanel → *Advanced → PHP Configuration* → select **PHP 8.3** (or newer). Enable the extensions `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `intl` and `bcmath`. Most of these are on by default.
@@ -9,14 +20,14 @@ The repository is set up to run on Hostinger shared/cloud hosting **without Node
 3. **Git** — hPanel → *Advanced → Git*:
    * Repository: `https://github.com/anwarhk-19/Easymobile.git` (if the repo is private, add the SSH deploy key that hPanel shows you to GitHub → repo → Settings → Deploy keys)
    * Branch: `master`
-   * Install path: leave **empty** to deploy into `public_html`
+   * Install path: **empty** to deploy into `public_html`, or **`easymobile`** to deploy into `public_html/easymobile` (see the table above)
    * After creating it, enable **Auto deployment** and add the webhook URL that hPanel gives you to GitHub → Settings → Webhooks.
 4. **SSH** — hPanel → *Advanced → SSH Access* → enable it. You need SSH once for setup and after each deploy.
 
 ## 2. First deploy (over SSH)
 
 ```bash
-cd ~/domains/YOUR-DOMAIN/public_html      # the folder the Git deploy wrote to
+cd ~/domains/YOUR-DOMAIN/public_html      # the folder the Git deploy wrote to (add /easymobile for a folder install)
 cp .env.example .env
 nano .env
 ```
@@ -27,7 +38,7 @@ Set these values in `.env`:
 APP_NAME="Bhatkal Mobile Hub"
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://YOUR-DOMAIN
+APP_URL=https://YOUR-DOMAIN          # folder install: https://devpulsetech.com/easymobile
 
 DB_CONNECTION=mysql
 DB_HOST=localhost

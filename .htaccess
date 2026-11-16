@@ -1,14 +1,14 @@
-# Hostinger / shared hosting: when the whole repository is deployed into public_html,
-# send every request into Laravel's public/ folder so app code, .env, vendor/ and storage/
-# are never reachable from the web.
+# Hostinger / shared hosting: when the repository is deployed into public_html (or a sub-folder
+# of it, e.g. public_html/easymobile), send every request into Laravel's public/ folder so app
+# code, .env, vendor/ and storage/ are never reachable from the web.
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
     # Block dotfiles (.env, .git, …) outright.
     RewriteRule (^|/)\.(?!well-known/) - [F,L]
 
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteRule ^(.*)$ public/$1 [L,QSA]
+    # Pattern is relative to this folder, so it works at the domain root and in a sub-folder.
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
 </IfModule>
 
 <FilesMatch "^\.">

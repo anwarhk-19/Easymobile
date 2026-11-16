@@ -57,6 +57,10 @@ Artisan::command('bmh:doctor', function () {
         $this->line(($pass ? '<fg=green>✓</>' : '<fg=red>✗</>')." {$label}".(! $pass && $fix ? "\n    → {$fix}" : ''));
     };
 
+    $head = @file_get_contents(base_path('.git/HEAD'));
+    $commit = $head && str_starts_with($head, 'ref: ') ? @file_get_contents(base_path('.git/'.trim(substr($head, 5)))) : $head;
+    $this->line('<fg=gray>Code version: '.($commit ? substr(trim($commit), 0, 7) : 'unknown (no .git folder)').' — compare with the latest commit on GitHub master. If it differs, run: git pull && bash deploy.sh</>');
+
     $check('PHP '.PHP_VERSION.' (need 8.3+)', version_compare(PHP_VERSION, '8.3.0', '>='), 'Select PHP 8.3 in hPanel → Advanced → PHP Configuration (and use that binary over SSH).');
     foreach (['pdo_mysql', 'mbstring', 'openssl', 'fileinfo', 'tokenizer', 'ctype', 'json'] as $ext) {
         $check("PHP extension {$ext}", extension_loaded($ext), "Enable {$ext} in hPanel → PHP Configuration → PHP Extensions.");

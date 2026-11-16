@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/icons';
 import { Alert, Async, Badge, Button, Empty, Field, FileDrop, Input, PageHeader, Pagination, Section, Select, StatusBadge, Textarea } from '../../components/ui';
-import { post, tokenStore } from '../../lib/api';
+import { fetchPrivate, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { useAction, useApi, useForm, useMeta } from '../../lib/hooks';
 import { useToast } from '../../lib/toast';
@@ -63,9 +63,9 @@ export function NewTicket() {
 
 function Attachment({ a }) {
     const download = async () => {
-        const res = await fetch(`/api/v1/ticket-attachments/${a.id}`, { headers: { Authorization: `Bearer ${tokenStore.get()}` } });
-        if (!res.ok) return;
-        const url = URL.createObjectURL(await res.blob());
+        let blob;
+        try { blob = await fetchPrivate(`/ticket-attachments/${a.id}`); } catch { return; }
+        const url = URL.createObjectURL(blob);
         Object.assign(document.createElement('a'), { href: url, download: a.original_name }).click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };

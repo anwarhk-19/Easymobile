@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Icon from '../../components/icons';
 import { Toolbar } from '../../components/DataTable';
 import { Alert, Async, Badge, Button, ConfirmDialog, Empty, Input, PageHeader, Pagination, Select, Tabs } from '../../components/ui';
-import { del, tokenStore } from '../../lib/api';
+import { del, fetchPrivate } from '../../lib/api';
 import { useAction, useApi, useDebounced } from '../../lib/hooks';
 import { useToast } from '../../lib/toast';
 import { ago, label } from '../../lib/format';
@@ -42,9 +42,9 @@ export default function SystemLogs() {
     const clear = useAction(() => del(`/admin/system-logs/${encodeURIComponent(file)}`), { onSuccess: (r) => { toast(r.message); setConfirmClear(false); entries.reload(); files.reload(); }, onError: (e) => toast(e.message, 'error') });
 
     const download = async () => {
-        const res = await fetch(`/api/v1/admin/system-logs/${encodeURIComponent(file)}/download`, { headers: { Authorization: `Bearer ${tokenStore.get()}` } });
-        if (!res.ok) return toast('Download failed', 'error');
-        const url = URL.createObjectURL(await res.blob());
+        let blob;
+        try { blob = await fetchPrivate(`/admin/system-logs/${encodeURIComponent(file)}/download`); } catch { return toast('Download failed', 'error'); }
+        const url = URL.createObjectURL(blob);
         Object.assign(document.createElement('a'), { href: url, download: file }).click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };

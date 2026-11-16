@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/icons';
 import { Alert, Async, Badge, Button, Checkbox, ConfirmDialog, DL, Empty, Field, FileDrop, Input, Modal, PageHeader, Pagination, Section, Select, StarInput, StatusBadge, Textarea, Timeline, WhatsAppButton } from '../../components/ui';
-import { get, post } from '../../lib/api';
+import { get, post, tokenStore } from '../../lib/api';
 import { useAction, useApi, useForm, useMeta } from '../../lib/hooks';
 import { useToast } from '../../lib/toast';
 import { date, dateTime, label, money } from '../../lib/format';
@@ -194,7 +194,7 @@ export function AuthImage({ url }) {
     const [src, setSrc] = useState(null);
     useEffect(() => {
         let u;
-        const token = (() => { try { return localStorage.getItem('bmh_token'); } catch { return null; } })();
+        const token = tokenStore.get();
         fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) => (r.ok ? r.blob() : null)).then((b) => b && setSrc((u = URL.createObjectURL(b)))).catch(() => {});
         return () => u && URL.revokeObjectURL(u);
     }, [url]);
