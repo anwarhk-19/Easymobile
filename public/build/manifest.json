@@ -1,20 +1,20 @@
 {
-  "_Other-CpVGgAF-.js": {
-    "file": "assets/Other-CpVGgAF-.js",
+  "_Other-CWIaNFwY.js": {
+    "file": "assets/Other-CWIaNFwY.js",
     "name": "Other",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_Repairs-DSiT-bA5.js": {
-    "file": "assets/Repairs-DSiT-bA5.js",
+  "_Repairs-7IuXGTz4.js": {
+    "file": "assets/Repairs-7IuXGTz4.js",
     "name": "Repairs",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_Support-C29DIJaU.js": {
-    "file": "assets/Support-C29DIJaU.js",
+  "_Support-BdryK6yo.js": {
+    "file": "assets/Support-BdryK6yo.js",
     "name": "Support",
     "imports": [
       "resources/js/app.jsx"
@@ -30,7 +30,7 @@
     "isEntry": true
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-1n3Dyg1b.js",
+    "file": "assets/app-BVQRzgyP.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -45,47 +45,47 @@
     ]
   },
   "resources/js/pages/admin/index.jsx": {
-    "file": "assets/admin-D7a-GahG.js",
+    "file": "assets/admin-CdEFyW6B.js",
     "name": "admin",
     "src": "resources/js/pages/admin/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Other-CpVGgAF-.js",
-      "_Support-C29DIJaU.js",
-      "_Repairs-DSiT-bA5.js"
+      "_Other-CWIaNFwY.js",
+      "_Support-BdryK6yo.js",
+      "_Repairs-7IuXGTz4.js"
     ]
   },
   "resources/js/pages/customer/index.jsx": {
-    "file": "assets/customer-C0cwfP4M.js",
+    "file": "assets/customer-Dr7ZKF6L.js",
     "name": "customer",
     "src": "resources/js/pages/customer/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Repairs-DSiT-bA5.js",
-      "_Support-C29DIJaU.js"
+      "_Repairs-7IuXGTz4.js",
+      "_Support-BdryK6yo.js"
     ]
   },
   "resources/js/pages/merchant/index.jsx": {
-    "file": "assets/merchant-DwQSF4Ys.js",
+    "file": "assets/merchant-ByuPWpVs.js",
     "name": "merchant",
     "src": "resources/js/pages/merchant/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Other-CpVGgAF-.js"
+      "_Other-CWIaNFwY.js"
     ]
   },
   "resources/js/pages/technician/index.jsx": {
-    "file": "assets/technician-DRo62QBq.js",
+    "file": "assets/technician-xCUcW5TO.js",
     "name": "technician",
     "src": "resources/js/pages/technician/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_Other-CpVGgAF-.js",
-      "_Repairs-DSiT-bA5.js"
+      "_Other-CWIaNFwY.js",
+      "_Repairs-7IuXGTz4.js"
     ]
   }
 }

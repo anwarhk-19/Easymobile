@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './icons';
 import { STATUS, label, whatsappIcon } from '../lib/format';
+import { BASE } from '../lib/api';
 
 export function Button({ as: As = 'button', variant = 'primary', size = 'md', busy, className = '', children, ...props }) {
     const v = {
@@ -64,6 +65,7 @@ export function ErrorState({ error, onRetry }) {
             <p className="font-semibold text-slate-900">{error?.status === 404 ? 'Not found' : error?.status === 403 ? 'No access' : 'Something went wrong'}</p>
             <p className="max-w-sm text-sm text-slate-500">{error?.message}</p>
             {onRetry && error?.status !== 404 && error?.status !== 403 && <Button variant="secondary" size="sm" onClick={onRetry}><Icon name="refresh" className="h-4 w-4" />Try again</Button>}
+            {(error?.status === 0 || error?.status >= 500) && <a href={`${BASE}/status`} className="text-xs font-semibold text-brand-700 underline">Check server status</a>}
         </div>
     );
 }

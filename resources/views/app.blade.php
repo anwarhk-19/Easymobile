@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0f6a5e">
     <meta name="description" content="Bhatkal Mobile Hub — find mobile phones, accessories and trusted repair technicians across Bhatkal.">
     {{-- Install path ("" at a domain root, "/easymobile" in a sub-folder). Read by the SPA for routing and API calls. --}}

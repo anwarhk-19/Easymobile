@@ -68,6 +68,9 @@ return [
     'timezone' => 'UTC',
 
     // Opening hours and business-day SLAs are evaluated in local (IST) time.
+    // Public /status page with setup checks (no secrets). Set STATUS_PAGE=false after launch to hide it.
+    'status_page' => (bool) env('STATUS_PAGE', true),
+
     'business_timezone' => env('BUSINESS_TIMEZONE', 'Asia/Kolkata'),
 
     /*

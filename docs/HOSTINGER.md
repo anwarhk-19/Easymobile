@@ -104,6 +104,9 @@ Never set `OTP_EXPOSE_CODE=true` on a public site. It would let anyone sign in a
 
 ## Troubleshooting
 
+**Easiest check — no SSH needed:** open **`https://YOUR-DOMAIN/status`** on your phone. This page doesn't use the API, so it works even when the API is failing. It checks the database connection, tables, base data, cache, folder permissions, the uploads link and the built frontend. Every failed check (✗) comes with the exact fix. It never shows passwords or server paths. Once the site is live, hide it by setting `STATUS_PAGE=false` in `.env` and running `php artisan config:cache`.
+
+
 **Run the health check first.** It checks PHP, `.env`, the database, migrations, folder permissions, the storage link, the built frontend, and whether the API answers. Each problem it finds comes with the fix:
 
 ```bash
