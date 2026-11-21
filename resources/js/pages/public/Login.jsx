@@ -43,7 +43,8 @@ export function Login() {
                     </form>
                 ) : (
                     <form className="mt-6 space-y-4" onSubmit={(e) => { e.preventDefault(); verify.run(); }}>
-                        {info?.debug_code && <Alert tone="blue" icon="message" title="Development mode">Your OTP is <b className="font-mono">{info.debug_code}</b> (SMS is not sent in local development).</Alert>}
+                        {info?.test_mode && <Alert tone="amber" icon="shield" title="Test account">No SMS is sent for this number. Enter the test OTP your administrator gave you.</Alert>}
+                        {info?.debug_code &&<Alert tone="blue" icon="message" title="Development mode">Your OTP is <b className="font-mono">{info.debug_code}</b> (SMS is not sent in local development).</Alert>}
                         <Field label="6-digit OTP"><Input inputMode="numeric" autoComplete="one-time-code" maxLength={6} className="text-center font-mono text-2xl tracking-[.5em]" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} autoFocus required /></Field>
                         {!info?.is_registered && (
                             <>

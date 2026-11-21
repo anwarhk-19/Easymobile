@@ -96,6 +96,20 @@ Replace the user and domain with yours, and use the PHP 8.3 binary path if `/usr
 ln -s ../storage/app/public public/storage
 ```
 
+## Testing logins before SMS is connected
+
+1. Load the demo accounts (shops, products, technicians, customers):
+   ```bash
+   php artisan db:seed --class=SampleMarketplaceSeeder --force
+   ```
+2. Add a test code of your choice to `.env`, then run `php artisan config:cache`:
+   ```dotenv
+   OTP_TEST_CODE=246810
+   ```
+3. Sign in at `/login` with a demo number (e.g. customer `9900000001`, shop `9845000101`, technician `9845000201`) and that code.
+
+The test code works **only for the demo numbers**. To add your own test numbers, list them, including the demo ones you still want: `OTP_TEST_PHONES=9900000001,9845000101,98XXXXXXXX`. Every test-code login is written to the log. **Before real customers use the site, delete `OTP_TEST_CODE`** and run `php artisan config:cache`.
+
 ## ⚠️ Customer login needs an SMS provider
 
 Customers, merchants and technicians sign in with an **OTP sent by SMS**. The project ships with a *log* SMS driver, which writes the OTP to `storage/logs/laravel.log` instead of sending it. So until a real SMS gateway (MSG91, Fast2SMS, Twilio, etc. — DLT-registered for India) is plugged in, **only the admin (email/password) can sign in on the live site**.

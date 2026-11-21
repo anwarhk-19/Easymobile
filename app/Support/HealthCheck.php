@@ -27,6 +27,8 @@ final class HealthCheck
 
         $add('PHP 8.3 or newer', version_compare(PHP_VERSION, '8.3.0', '>='), 'Select PHP 8.3 in hPanel → Advanced → PHP Configuration.');
         $add('PHP MySQL driver (pdo_mysql)', extension_loaded('pdo_mysql'), 'Enable pdo_mysql in hPanel → PHP Configuration → PHP Extensions.');
+        $add('Test OTP not open to every number', ! (config('otp.test_code') && in_array('*', config('otp.test_phones', []), true)),
+            'OTP_TEST_PHONES=* lets anyone who knows the test code sign in as any user. List specific test numbers instead, or remove OTP_TEST_CODE, then php artisan config:cache');
         $add('App key configured', (bool) config('app.key'), 'Run: php artisan key:generate --force && php artisan config:cache');
         $add('Debug mode off', ! config('app.debug') || ! app()->isProduction(), 'Set APP_DEBUG=false in .env, then php artisan config:cache');
         $add('Site address (APP_URL) matches this domain', self::sameHost(), 'Set APP_URL=https://'.request()->getHost().' in .env, then php artisan config:cache');
