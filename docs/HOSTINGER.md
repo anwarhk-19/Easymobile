@@ -2,6 +2,24 @@
 
 The repository is set up to run on Hostinger shared/cloud hosting **without Node.js**: the compiled frontend (`public/build`) is committed, and a root `.htaccess` sends every request into Laravel's `public/` folder.
 
+## Quickest setup — no SSH (recommended)
+
+1. In hPanel → **Databases → MySQL Databases**, create a database and user, and note the name, username and password.
+2. Open **`https://YOUR-DOMAIN/install`** on your phone or computer. Enter the database details and tap **Install**. Leave the admin fields blank to use the default login.
+3. Done. The setup page locks itself afterwards.
+
+**Default logins (change the passwords right away; they are public):**
+
+| Who | Where | Login |
+|---|---|---|
+| Admin | `/staff` | `admin@bhatkalmobilehub.in` / `ChangeMe@2026` |
+| Support | `/staff` | `support@bhatkalmobilehub.in` / `Support@2026` |
+| Demo customer | `/login` | `9900000001`, OTP `998001` |
+| Demo shop owner | `/login` | `9845000101`, OTP `998001` |
+| Demo technician | `/login` | `9845000201`, OTP `998001` |
+
+Change staff passwords in **Admin → My account**. Turn test OTP logins off before real customers use the site: set `OTP_TEST_CODE=off` in `.env`. The master OTP only works for the demo numbers.
+
 ## Where to install: domain root or a folder
 
 The app works in either place, with the same code:

@@ -5,6 +5,7 @@ import { AdminOrderDetail, AdminOrders, AdminRepairDetail, AdminRepairs, AdminTi
 import { Commissions, Refunds, Reviews, Settlements } from './Finance';
 import { ActivityLogs, Catalogue, Reports, SearchInsights, Settings, Templates } from './System';
 import SystemLogs from './SystemLogs';
+import Account from './Account';
 
 export default function AdminRoutes() {
     return (
@@ -34,6 +35,7 @@ export default function AdminRoutes() {
             <Route path="logs" element={<ActivityLogs />} />
             <Route path="settings" element={<Settings />} />
             <Route path="system-logs" element={<SystemLogs />} />
+            <Route path="account" element={<Account />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

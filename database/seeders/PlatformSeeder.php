@@ -12,19 +12,24 @@ use Illuminate\Database\Seeder;
 
 class PlatformSeeder extends Seeder
 {
+    public const DEFAULT_ADMIN_EMAIL = 'admin@bhatkalmobilehub.in';
+
+    public const DEFAULT_ADMIN_PASSWORD = 'ChangeMe@2026';
+
+    public const DEFAULT_SUPPORT_EMAIL = 'support@bhatkalmobilehub.in';
+
+    public const DEFAULT_SUPPORT_PASSWORD = 'Support@2026';
+
     public function run(): void
     {
-        $adminPassword = env('ADMIN_PASSWORD') ?: null;
-        if (app()->isProduction() && ! $adminPassword) {
-            throw new \RuntimeException('Set ADMIN_PASSWORD in .env before seeding production.');
-        }
-        $adminEmail = env('ADMIN_EMAIL') ?: 'admin@bhatkalmobilehub.in';
+        // Default staff accounts so the site can be tried immediately. The passwords are public (they are in
+        // this repository): change them in Admin → My account → Change password. /status warns while they're in use.
+        $adminEmail = env('ADMIN_EMAIL') ?: self::DEFAULT_ADMIN_EMAIL;
         if (! User::where('email', $adminEmail)->exists()) {
-            User::create(['email' => $adminEmail, 'name' => 'Platform Admin', 'role' => 'admin', 'status' => 'active', 'password' => $adminPassword ?? 'ChangeMe@2026']);
+            User::create(['email' => $adminEmail, 'name' => 'Platform Admin', 'role' => 'admin', 'status' => 'active', 'password' => env('ADMIN_PASSWORD') ?: self::DEFAULT_ADMIN_PASSWORD]);
         }
-        // Demo support operator only outside production; create real operators from Admin → Users.
-        if (! app()->isProduction() && ! User::where('email', 'support@bhatkalmobilehub.in')->exists()) {
-            User::create(['email' => 'support@bhatkalmobilehub.in', 'name' => 'Support Desk', 'role' => 'support', 'status' => 'active', 'password' => 'Support@2026']);
+        if (! User::where('email', self::DEFAULT_SUPPORT_EMAIL)->exists()) {
+            User::create(['email' => self::DEFAULT_SUPPORT_EMAIL, 'name' => 'Support Desk', 'role' => 'support', 'status' => 'active', 'password' => self::DEFAULT_SUPPORT_PASSWORD]);
         }
 
         // Pilot: free listings for everyone, small per-order commission on smartphones only.

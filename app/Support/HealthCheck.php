@@ -5,9 +5,11 @@ namespace App\Support;
 use App\Models\Category;
 use App\Models\Role;
 use App\Models\User;
+use Database\Seeders\PlatformSeeder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 
@@ -51,7 +53,9 @@ final class HealthCheck
                     ->diff(DB::table('migrations')->pluck('migration'))->count();
                 $add('All migrations applied', $pending === 0, "Run: php artisan migrate --force   ({$pending} pending)");
                 $add('Base data loaded (roles, categories)', Role::count() > 0 && Category::count() > 0, 'Run: php artisan db:seed --force');
-                $add('Admin account exists', User::where('role', 'admin')->exists(), 'Set ADMIN_EMAIL and ADMIN_PASSWORD in .env, then: php artisan db:seed --force');
+                $add('Admin account exists', User::where('role', 'admin')->exists(), 'Open /install to finish setup, or run: php artisan db:seed --force');
+                $defaults = User::whereIn('role', ['admin', 'support'])->whereNotNull('password')->get()->filter(fn ($u) => Hash::check(PlatformSeeder::DEFAULT_ADMIN_PASSWORD, $u->password) || Hash::check(PlatformSeeder::DEFAULT_SUPPORT_PASSWORD, $u->password));
+                $add('Staff passwords changed from the defaults', $defaults->isEmpty(), 'The default admin/support passwords are public. Sign in at /staff and use Admin → My account → Change password ('.$defaults->count().' account(s) still on the default).');
             }
         }
 

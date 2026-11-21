@@ -18,6 +18,7 @@ export function AdminDashboard() {
             {({ stats: s, queues: q, recent_orders }) => (
                 <div className="space-y-5">
                     <PageHeader title="Marketplace overview" subtitle={`Signed in as ${user.name}`} />
+                    {user.uses_default_password && <Alert tone="red" title="Change your password">You're signed in with the default password, which is public. <Link className="font-semibold underline" to="/admin/account">Change it now</Link></Alert>}
                     {s.escalated_complaints > 0 && <Alert tone="red" title={`${s.escalated_complaints} escalated complaint(s) need attention`}><Link className="font-semibold underline" to="/admin/tickets?escalated=1">Open complaints</Link></Alert>}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         <Stat label="Customers" value={s.customers} icon="user" to="/admin/users?role=customer" />

@@ -7,10 +7,14 @@ use Tests\TestCase;
 
 class TestOtpTest extends TestCase
 {
-    public function test_disabled_by_default(): void
+    public function test_default_master_otp_is_998001_and_can_be_switched_off(): void
     {
         User::factory()->create(['phone' => '9900000001']);
-        $this->postJson('/api/v1/auth/otp/verify', ['phone' => '9900000001', 'code' => '000000'])->assertStatus(422);
+        $this->assertSame('998001', config('otp.test_code'));
+        $this->postJson('/api/v1/auth/otp/verify', ['phone' => '9900000001', 'code' => '998001'])->assertOk()->assertJsonStructure(['token']);
+
+        config(['otp.test_code' => null]); // what OTP_TEST_CODE=off produces
+        $this->postJson('/api/v1/auth/otp/verify', ['phone' => '9900000001', 'code' => '998001'])->assertStatus(422);
     }
 
     public function test_test_code_signs_in_listed_numbers_without_sms(): void

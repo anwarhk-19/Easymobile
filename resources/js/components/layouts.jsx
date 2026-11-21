@@ -88,8 +88,8 @@ const PORTALS = {
         title: 'Admin',
         nav: [['', 'chart', 'Dashboard'], ['shops', 'store', 'Shops'], ['technicians', 'wrench', 'Technicians'], ['users', 'user', 'Users'], ['products', 'box', 'Listings'], ['orders', 'bag', 'Orders'], ['repairs', 'tool', 'Repairs'],
             ['tickets', 'ticket', 'Complaints'], ['reviews', 'star', 'Reviews'], ['refunds', 'refresh', 'Refunds'], ['settlements', 'rupee', 'Settlements'], ['commissions', 'rupee', 'Commission'],
-            ['catalogue', 'list', 'Catalogue'], ['templates', 'message', 'Templates'], ['reports', 'chart', 'Reports'], ['searches', 'search', 'Search insights'], ['logs', 'shield', 'Audit log'], ['system-logs', 'file', 'System logs'], ['settings', 'settings', 'Settings']],
-        support: ['', 'tickets', 'orders', 'repairs', 'users'],
+            ['catalogue', 'list', 'Catalogue'], ['templates', 'message', 'Templates'], ['reports', 'chart', 'Reports'], ['searches', 'search', 'Search insights'], ['logs', 'shield', 'Audit log'], ['system-logs', 'file', 'System logs'], ['settings', 'settings', 'Settings'], ['account', 'user', 'My account']],
+        support: ['', 'tickets', 'orders', 'repairs', 'users', 'account'],
     },
 };
 

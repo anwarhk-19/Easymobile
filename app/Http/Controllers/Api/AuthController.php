@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Services\OtpService;
 use App\Support\Phone;
+use Database\Seeders\PlatformSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -118,6 +121,29 @@ class AuthController extends Controller
         return response()->json(['user' => $this->present($user->fresh())]);
     }
 
+    /** Staff change their own password (needed because the default staff passwords are public). */
+    public function changePassword(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless($user->isStaff(), 403, 'Only staff accounts use passwords.');
+        $data = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
+        ]);
+        if (! Hash::check($data['current_password'], $user->password)) {
+            throw ValidationException::withMessages(['current_password' => 'Your current password is incorrect.']);
+        }
+        if (Hash::check($data['password'], $user->password)) {
+            throw ValidationException::withMessages(['password' => 'Choose a password different from the current one.']);
+        }
+        $user->forceFill(['password' => $data['password']])->save();
+        // Sign out other devices that used the old password.
+        $user->tokens()->where('id', '!=', $user->currentAccessToken()?->id)->delete();
+        AuditLogger::log('staff.password_changed', $user, "{$user->email} changed their password");
+
+        return response()->json(['message' => 'Password changed. Other devices have been signed out.']);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()?->delete();
@@ -141,6 +167,7 @@ class AuthController extends Controller
             'shop' => $user->shop,
             'technician' => $user->technicianProfile,
             'unread_notifications' => $user->unreadNotifications()->count(),
+            'uses_default_password' => $user->isStaff() && $user->password && in_array(true, array_map(fn ($p) => Hash::check($p, $user->password), [PlatformSeeder::DEFAULT_ADMIN_PASSWORD, PlatformSeeder::DEFAULT_SUPPORT_PASSWORD]), true),
         ];
     }
 }

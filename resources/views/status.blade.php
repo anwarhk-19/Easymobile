@@ -29,6 +29,9 @@
 <main>
     <h1>Bhatkal Mobile Hub — server status</h1>
     <div>{{ request()->getHost() }} · {{ now()->setTimezone(config('app.business_timezone'))->format('d M Y, H:i') }} IST</div>
+    @if (! $installed)
+        <div class="sum bad">The site hasn't been set up yet. <a href="{{ rtrim(request()->getBasePath(), '/') }}/install">Run the one-time setup →</a></div>
+    @endif
     <div class="sum {{ $failed ? 'bad' : 'good' }}">{{ $failed ? "$failed problem(s) found — fix the items marked ✗ below." : 'All checks passed. The API should be working.' }}</div>
     <ul>
         @foreach ($checks as $c)
