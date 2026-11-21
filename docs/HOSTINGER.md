@@ -18,7 +18,15 @@ The repository is set up to run on Hostinger shared/cloud hosting **without Node
 | Demo shop owner | `/login` | `9845000101`, OTP `998001` |
 | Demo technician | `/login` | `9845000201`, OTP `998001` |
 
-Change staff passwords in **Admin → My account**. Turn test OTP logins off before real customers use the site: set `OTP_TEST_CODE=off` in `.env`. The master OTP only works for the demo numbers.
+**Testing phase:** OTP `998001` signs in **any** phone number, so testers can register as customer, shop owner or technician with their own numbers.
+
+### Before launch checklist
+1. Connect an SMS provider for real OTPs (e.g. Twilio Verify or MSG91; SendGrid sends email only).
+2. Set `OTP_TEST_CODE=off` in `.env`.
+3. Change the admin and support passwords in **Admin → My account**.
+4. Set `STATUS_PAGE=false` in `.env`.
+
+The `/status` page lists items 2 and 3 as ⚠ reminders until they're done.
 
 ## Where to install: domain root or a folder
 

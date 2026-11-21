@@ -19,18 +19,22 @@ use Throwable;
  */
 final class HealthCheck
 {
-    /** @return array<int, array{label:string, ok:bool, hint:?string}> */
+    /**
+     * `warn` items are reminders for before launch (testing conveniences); they don't count as failures.
+     *
+     * @return array<int, array{label:string, ok:bool, warn:bool, hint:?string}>
+     */
     public static function run(): array
     {
         $out = [];
-        $add = function (string $label, bool $ok, ?string $hint = null) use (&$out) {
-            $out[] = ['label' => $label, 'ok' => $ok, 'hint' => $ok ? null : $hint];
+        $add = function (string $label, bool $ok, ?string $hint = null, bool $warn = false) use (&$out) {
+            $out[] = ['label' => $label, 'ok' => $ok, 'warn' => $warn && ! $ok, 'hint' => $ok ? null : $hint];
         };
 
         $add('PHP 8.3 or newer', version_compare(PHP_VERSION, '8.3.0', '>='), 'Select PHP 8.3 in hPanel → Advanced → PHP Configuration.');
         $add('PHP MySQL driver (pdo_mysql)', extension_loaded('pdo_mysql'), 'Enable pdo_mysql in hPanel → PHP Configuration → PHP Extensions.');
-        $add('Test OTP not open to every number', ! (config('otp.test_code') && in_array('*', config('otp.test_phones', []), true)),
-            'OTP_TEST_PHONES=* lets anyone who knows the test code sign in as any user. List specific test numbers instead, or remove OTP_TEST_CODE, then php artisan config:cache');
+        $add('Before launch: test OTP off', ! config('otp.test_code'),
+            'Testing mode: OTP '.config('otp.test_code').' signs in '.(in_array('*', config('otp.test_phones', []), true) ? 'ANY phone number (OTP_TEST_PHONES=*)' : 'the listed test numbers').'. Before real customers use the site, set OTP_TEST_CODE=off in .env and connect an SMS provider.', warn: true);
         $add('App key configured', (bool) config('app.key'), 'Run: php artisan key:generate --force && php artisan config:cache');
         $add('Debug mode off', ! config('app.debug') || ! app()->isProduction(), 'Set APP_DEBUG=false in .env, then php artisan config:cache');
         $add('Site address (APP_URL) matches this domain', self::sameHost(), 'Set APP_URL=https://'.request()->getHost().' in .env, then php artisan config:cache');
@@ -55,7 +59,7 @@ final class HealthCheck
                 $add('Base data loaded (roles, categories)', Role::count() > 0 && Category::count() > 0, 'Run: php artisan db:seed --force');
                 $add('Admin account exists', User::where('role', 'admin')->exists(), 'Open /install to finish setup, or run: php artisan db:seed --force');
                 $defaults = User::whereIn('role', ['admin', 'support'])->whereNotNull('password')->get()->filter(fn ($u) => Hash::check(PlatformSeeder::DEFAULT_ADMIN_PASSWORD, $u->password) || Hash::check(PlatformSeeder::DEFAULT_SUPPORT_PASSWORD, $u->password));
-                $add('Staff passwords changed from the defaults', $defaults->isEmpty(), 'The default admin/support passwords are public. Sign in at /staff and use Admin → My account → Change password ('.$defaults->count().' account(s) still on the default).');
+                $add('Staff passwords changed from the defaults', $defaults->isEmpty(), 'Before launch: the default admin/support passwords are public. Change them in Admin → My account ('.$defaults->count().' account(s) still on the default).', warn: true);
             }
         }
 

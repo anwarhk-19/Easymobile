@@ -45,6 +45,6 @@ class TestOtpTest extends TestCase
     public function test_status_page_warns_when_open_to_everyone(): void
     {
         config(['otp.test_code' => '246810', 'otp.test_phones' => ['*']]);
-        $this->get('/status')->assertSee('OTP_TEST_PHONES=*');
+        $this->get('/status')->assertSee('ANY phone number')->assertSee('⚠', false);
     }
 }

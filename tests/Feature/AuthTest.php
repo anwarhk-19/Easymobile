@@ -7,6 +7,13 @@ use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
+    /** These tests cover the real (post-launch) OTP flow, so the testing-phase master OTP is switched off. */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['otp.test_code' => null]);
+    }
+
     public function test_customer_registers_and_logs_in_with_otp(): void
     {
         $code = $this->postJson('/api/v1/auth/otp/send', ['phone' => '+91 98450 12345'])

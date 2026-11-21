@@ -1,4 +1,4 @@
-@php($failed = collect($checks)->where('ok', false)->count())
+@php($failed = collect($checks)->where('ok', false)->where('warn', false)->count())
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +19,7 @@
         li:first-child { border-top: 0; }
         .row { display: flex; gap: 10px; align-items: flex-start; }
         .icon { font-weight: 700; width: 18px; flex: none; }
-        .ok .icon { color: #059669; } .fail .icon { color: #dc2626; }
+        .ok .icon { color: #059669; } .fail .icon { color: #dc2626; } .warn .icon { color: #d97706; }
         .hint { margin: 4px 0 0 28px; font-size: 13px; color: #475569; word-break: break-word; }
         code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
         p.meta { color: #64748b; font-size: 13px; margin-top: 16px; }
@@ -35,8 +35,8 @@
     <div class="sum {{ $failed ? 'bad' : 'good' }}">{{ $failed ? "$failed problem(s) found — fix the items marked ✗ below." : 'All checks passed. The API should be working.' }}</div>
     <ul>
         @foreach ($checks as $c)
-            <li class="{{ $c['ok'] ? 'ok' : 'fail' }}">
-                <div class="row"><span class="icon">{{ $c['ok'] ? '✓' : '✗' }}</span><span>{{ $c['label'] }}</span></div>
+            <li class="{{ $c['ok'] ? 'ok' : ($c['warn'] ? 'warn' : 'fail') }}">
+                <div class="row"><span class="icon">{{ $c['ok'] ? '✓' : ($c['warn'] ? '⚠' : '✗') }}</span><span>{{ $c['label'] }}</span></div>
                 @if ($c['hint'])<div class="hint">{{ $c['hint'] }}</div>@endif
             </li>
         @endforeach

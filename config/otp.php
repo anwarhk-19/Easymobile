@@ -19,6 +19,6 @@ return [
      * so use * only briefly. Remove OTP_TEST_CODE before real customers use the site.
      */
     'test_code' => preg_match('/^\d{6}$/', (string) (env('OTP_TEST_CODE') ?: '998001')) ? (string) (env('OTP_TEST_CODE') ?: '998001') : null,
-    'test_phones' => array_values(array_filter(array_map('trim', explode(',', (string) env('OTP_TEST_PHONES',
-        '9900000001,9900000002,9900000003,9900000004,9845000101,9845000102,9845000103,9845000104,9845000105,9845000106,9845000109,9845000201,9845000202,9845000203,9845000204,9845000209'))))),
+    // Testing phase: '*' = any number. Before launch set OTP_TEST_CODE=off (or list specific numbers here).
+    'test_phones' => array_values(array_filter(array_map('trim', explode(',', (string) env('OTP_TEST_PHONES', '*'))))),
 ];

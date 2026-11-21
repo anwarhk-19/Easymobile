@@ -65,7 +65,7 @@ To use MySQL instead, keep the `DB_*` values from `.env.example` and create the 
 |---|---|
 | Admin | `/staff`, email `admin@bhatkalmobilehub.in`, password `ChangeMe@2026` (change it in Admin → My account) |
 | Support | `/staff`, email `support@bhatkalmobilehub.in`, password `Support@2026` |
-| Customer | `/login`, phone `9900000001` (Ayesha), OTP `998001` (test OTP for demo numbers; set `OTP_TEST_CODE=off` to disable) |
+| Customer | `/login`, phone `9900000001` (Ayesha), OTP `998001` (testing-phase master OTP, works for any number; set `OTP_TEST_CODE=off` before launch) |
 | Merchant | phone `9845000101` (Al-Noor Mobiles) |
 | Technician | phone `9845000201` (Imran Mobile Repairs) or `9845000202` (Fix-It Fast) |
 
