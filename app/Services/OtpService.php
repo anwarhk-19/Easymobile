@@ -21,7 +21,7 @@ class OtpService
         $ipKey = 'otp-send:ip:'.$ip;
 
         // Test numbers with a test OTP configured: no SMS and no per-number limit (the per-IP limit still applies).
-        if (self::testLoginEnabled() && (in_array('*', $cfg['test_phones'], true) || in_array($phone, $cfg['test_phones'], true))) {
+        if (self::testLoginEnabled() && self::isTestPhone($phone)) {
             if (RateLimiter::tooManyAttempts($ipKey, $cfg['max_sends_per_ip'])) {
                 throw ValidationException::withMessages(['phone' => 'Too many OTP requests. Try again later.'])->status(429);
             }
@@ -81,6 +81,10 @@ class OtpService
 
         $otp = OtpCode::where('phone', $phone)->whereNull('consumed_at')->latest('id')->first();
 
+        // Testing mode sends no SMS (so there's no stored code): a wrong code is simply incorrect, not expired.
+        if (! $otp && self::testLoginEnabled() && self::isTestPhone($phone)) {
+            throw ValidationException::withMessages(['code' => 'The OTP entered is incorrect.']);
+        }
         if (! $otp || $otp->expires_at->isPast()) {
             throw ValidationException::withMessages(['code' => 'The OTP has expired. Please request a new one.']);
         }
@@ -104,6 +108,13 @@ class OtpService
 
         return $testCode !== null && hash_equals($testCode, $code)
             && (in_array('*', $phones, true) || in_array($phone, $phones, true));
+    }
+
+    public static function isTestPhone(string $phone): bool
+    {
+        $phones = config('otp.test_phones', []);
+
+        return in_array('*', $phones, true) || in_array($phone, $phones, true);
     }
 
     public static function testLoginEnabled(): bool

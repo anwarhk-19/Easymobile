@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/icons';
 import DataTable, { Toolbar } from '../../components/DataTable';
+import { ListCard } from '../../components/portal';
 import { Alert, Async, Button, ConfirmDialog, DL, Field, Input, Modal, PageHeader, Section, Select, StatusBadge, Tabs, Textarea, Timeline, WhatsAppButton } from '../../components/ui';
 import { post } from '../../lib/api';
 import { useAction, useApi, useDebounced } from '../../lib/hooks';
 import { useToast } from '../../lib/toast';
 import { ago, dateTime, label, money } from '../../lib/format';
+
+/** What the shop has to do next, per order status. */
+const NEXT_STEP = { requested: 'Next: confirm availability & price', accepted: 'Next: confirm the order', confirmed: 'Next: mark ready', ready: 'Next: mark delivered / collected' };
 
 export function MerchantOrders() {
     const [params, setParams] = useSearchParams();
@@ -21,7 +25,15 @@ export function MerchantOrders() {
             <PageHeader title="Orders" subtitle="Order requests are not confirmed until you quote, the customer accepts, and you confirm." />
             <Tabs className="mb-3" value={status} onChange={(s) => { setParams(s ? { status: s } : {}); setPage(1); }} tabs={[['', 'All'], ['action', 'Needs action'], ['pending', 'Pending'], ['active', 'In progress'], ['completed', 'Completed'], ['closed', 'Cancelled']]} />
             <Toolbar><Input type="search" placeholder="Search reference" value={q} onChange={(e) => setQ(e.target.value)} /></Toolbar>
-            <DataTable state={state} onPage={setPage} empty="No orders here" emptyIcon="bag" onRowClick={(o) => navigate(`/merchant/orders/${o.id}`)} columns={[
+            <DataTable state={state} onPage={setPage} empty="No orders here" emptyIcon="bag" onRowClick={(o) => navigate(`/merchant/orders/${o.id}`)}
+                card={(o) => (
+                    <ListCard to={`/merchant/orders/${o.id}`} title={o.customer?.name} meta={`${o.reference} · ${ago(o.created_at)} · ${o.fulfilment === 'delivery' ? 'Delivery' : 'Pickup'}`} status={<StatusBadge status={o.status} />}
+                        footer={NEXT_STEP[o.status] && <span className="flex items-center justify-between text-sm font-semibold text-brand-700">{NEXT_STEP[o.status]}<Icon name="chevron" className="h-4 w-4" /></span>}>
+                        <p className="line-clamp-2">{o.items.map((i) => `${i.product_name} ×${i.quantity}`).join(', ')}</p>
+                        {Number(o.total_amount) > 0 && <p className="mt-1 font-bold text-slate-900">{money(o.total_amount)}</p>}
+                    </ListCard>
+                )}
+                columns={[
                 { key: 'reference', label: 'Order', render: (o) => <><b className="text-slate-900">{o.reference}</b><span className="block text-xs text-slate-400">{ago(o.created_at)}</span></> },
                 { key: 'customer', label: 'Customer', render: (o) => o.customer?.name },
                 { key: 'items', label: 'Items', render: (o) => <span className="line-clamp-2 min-w-48">{o.items.map((i) => `${i.product_name} ×${i.quantity}`).join(', ')}</span> },

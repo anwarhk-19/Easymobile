@@ -54,11 +54,11 @@ export default function ProductDetail() {
                 const discounted = product.discount_price && Number(product.discount_price) < Number(product.price);
                 const unavailable = product.availability === 'out_of_stock';
                 return (
-                    <div className="pb-24 md:pb-0">
-                        <nav className="mb-3 text-sm text-slate-500"><Link to="/search" className="hover:text-brand-700">Products</Link> / <Link to={`/search?category=${product.category.slug}`} className="hover:text-brand-700">{product.category.name}</Link></nav>
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <div>
-                                <div className="card overflow-hidden"><ProductImage product={{ ...product, primary_image: product.images[img] }} className="aspect-square" /></div>
+                    <div className="pb-36 md:pb-0">
+                        <nav className="mb-3 truncate text-sm text-slate-500"><Link to="/search" className="hover:text-brand-700">Products</Link> / <Link to={`/search?category=${product.category.slug}`} className="hover:text-brand-700">{product.category.name}</Link></nav>
+                        <div className="grid gap-5 md:grid-cols-2 md:gap-8">
+                            <div className="md:sticky md:top-20 md:self-start">
+                                <div className="card overflow-hidden"><ProductImage product={{ ...product, primary_image: product.images[img] }} className="aspect-[4/3] max-h-[38vh] md:aspect-square md:max-h-none" /></div>
                                 {product.images.length > 1 && (
                                     <div className="mt-2 flex gap-2 overflow-x-auto">{product.images.map((im, i) => (
                                         <button key={im.id} onClick={() => setImg(i)} className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 ${i === img ? 'border-brand-600' : 'border-transparent'}`} aria-label={`Image ${i + 1}`}><img src={im.url} alt="" className="h-full w-full object-cover" /></button>
@@ -73,8 +73,13 @@ export default function ProductDetail() {
                                     <span className="text-3xl font-extrabold text-slate-900">{money(product.effective_price)}</span>
                                     {discounted && <><span className="text-lg text-slate-400 line-through">{money(product.price)}</span><Badge tone="amber">{Math.round((1 - product.discount_price / product.price) * 100)}% off</Badge></>}
                                 </div>
-                                <div className="mt-3 flex flex-wrap items-center gap-3"><StatusBadge status={product.availability} />{product.stock_quantity > 0 && product.stock_quantity <= 5 && <span className="text-sm text-amber-700">Only {product.stock_quantity} left</span>}<Freshness freshness={product.stock_freshness} /></div>
-                                <p className="mt-1 text-xs text-slate-500">Final price and availability are confirmed by the shop before your order is confirmed.</p>
+                                <div className="mt-3 flex flex-wrap items-center gap-3"><StatusBadge status={product.availability} />{product.stock_quantity > 0 && product.stock_quantity <= 5 && <span className="text-sm font-medium text-amber-700">Only {product.stock_quantity} left</span>}<Freshness freshness={product.stock_freshness} /></div>
+
+                                <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                                    <li className="rounded-xl bg-slate-50 p-3"><span className="flex items-center gap-1.5 text-xs text-slate-500"><Icon name="store" className="h-3.5 w-3.5" />Sold by</span><Link to={`/shops/${shop.slug}`} className="mt-0.5 block truncate font-semibold text-slate-900 hover:text-brand-700">{shop.name}</Link><span className="block truncate text-xs text-slate-500">{shop.area?.name}{shop.is_open_now !== null && ` · ${shop.is_open_now ? 'Open now' : 'Closed now'}`}</span></li>
+                                    <li className="rounded-xl bg-slate-50 p-3"><span className="flex items-center gap-1.5 text-xs text-slate-500"><Icon name="truck" className="h-3.5 w-3.5" />Get it by</span><span className="mt-0.5 block font-semibold text-slate-900">{[shop.pickup_available && 'Pickup', shop.delivery_available && 'Delivery'].filter(Boolean).join(' or ') || 'Ask the shop'}</span><span className="block truncate text-xs text-slate-500">{shop.delivery_available ? (Number(shop.delivery_fee) ? `Delivery from ${money(shop.delivery_fee)}` : 'Free delivery') : 'Collect from the shop'}</span></li>
+                                </ul>
+                                <p className="mt-3 flex gap-1.5 text-xs text-slate-500"><Icon name="shield" className="h-3.5 w-3.5 shrink-0" />The shop confirms the final price and availability before anything is confirmed. You pay only on pickup or delivery.</p>
 
                                 <div className="mt-5 hidden gap-2 md:flex">
                                     <Button size="lg" disabled={unavailable} onClick={() => requireCustomer('order')}><Icon name="bag" />Request order</Button>
@@ -90,18 +95,18 @@ export default function ProductDetail() {
                             </div>
                         </div>
 
-                        <div className="mt-6 grid gap-4 md:grid-cols-2">
-                            <Section title={<Link to={`/shops/${shop.slug}`} className="hover:text-brand-700">Sold by {shop.name} →</Link>} action={<Stars value={shop.rating_avg} count={shop.rating_count} size="h-3.5 w-3.5" />}><ShopInfo shop={shop} /></Section>
-                            <Section title="Reviews"><ReviewList reviews={reviews} /></Section>
-                        </div>
-
                         {others.length > 0 && (
-                            <Section title="Also available at" className="mt-4">
+                            <Section title={`Compare: ${others.length} other shop${others.length > 1 ? 's' : ''} sell this`} className="mt-6">
                                 <ul className="divide-y divide-slate-100">{others.map((o) => (
                                     <li key={o.id} className="flex items-center justify-between gap-3 py-2.5 text-sm"><Link to={`/products/${o.slug}`} className="font-semibold text-slate-900 hover:text-brand-700">{o.shop.name}</Link><span className="flex items-center gap-3"><StatusBadge status={o.availability} /><b>{money(o.effective_price)}</b></span></li>
                                 ))}</ul>
                             </Section>
                         )}
+                        <div className="mt-6 grid gap-4 md:grid-cols-2">
+                            <Section title={<Link to={`/shops/${shop.slug}`} className="hover:text-brand-700">Sold by {shop.name} →</Link>} action={<Stars value={shop.rating_avg} count={shop.rating_count} size="h-3.5 w-3.5" />}><ShopInfo shop={shop} /></Section>
+                            <Section title="Reviews"><ReviewList reviews={reviews} /></Section>
+                        </div>
+
                         {related.length > 0 && <div className="mt-8"><h2 className="mb-3 text-lg font-extrabold text-slate-900">Similar products</h2><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{related.map((p) => <ProductCard key={p.id} product={p} />)}</div></div>}
 
                         <div className="fixed inset-x-0 bottom-16 z-20 flex gap-2 border-t border-slate-200 bg-white p-3 md:hidden">

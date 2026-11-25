@@ -34,12 +34,27 @@ export function Orders() {
 
 const STEPS = ['requested', 'quoted', 'accepted', 'confirmed', 'ready', 'handed_over', 'completed'];
 
+const STEP_LABELS = { requested: 'Requested', quoted: 'Price sent', accepted: 'Accepted', confirmed: 'Confirmed', ready: 'Ready', handed_over: 'Delivered', completed: 'Done' };
+
+/** Labelled order tracker: done steps filled, current step ringed. */
 function Progress({ status }) {
     const idx = STEPS.indexOf(status);
     if (idx < 0) return null;
     return (
-        <ol className="grid grid-cols-7 gap-1" aria-label="Order progress">
-            {STEPS.map((s, i) => <li key={s} title={label(s)} className={`h-1.5 rounded-full ${i <= idx ? 'bg-brand-500' : 'bg-slate-200'}`} />)}
+        <ol className="card flex items-start px-2 py-4" aria-label="Order progress">
+            {STEPS.map((s, i) => {
+                const done = i < idx || status === 'completed';
+                const current = i === idx && status !== 'completed';
+                return (
+                    <li key={s} className="relative flex flex-1 flex-col items-center text-center" aria-current={current ? 'step' : undefined}>
+                        {i > 0 && <span className={`absolute right-1/2 top-3 h-0.5 w-full ${i <= idx ? 'bg-brand-500' : 'bg-slate-200'}`} aria-hidden="true" />}
+                        <span className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${done ? 'bg-brand-600 text-white' : current ? 'bg-white text-brand-700 ring-2 ring-brand-600' : 'bg-slate-100 text-slate-400'}`}>
+                            {done ? <Icon name="check" className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
+                        </span>
+                        <span className={`mt-1.5 px-0.5 text-[10px] font-semibold leading-tight sm:text-xs ${current ? 'text-brand-700' : done ? 'text-slate-700' : 'text-slate-400'}`}>{STEP_LABELS[s]}</span>
+                    </li>
+                );
+            })}
         </ol>
     );
 }

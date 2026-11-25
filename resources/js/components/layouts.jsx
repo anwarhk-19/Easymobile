@@ -31,7 +31,9 @@ export function PublicLayout() {
     const meta = useMeta();
     const loc = useLocation();
     useEffect(() => { window.scrollTo(0, 0); }, [loc.pathname]);
-    const nav = [['/', 'home', 'Home'], ['/search', 'search', 'Search'], ['/repairs', 'wrench', 'Repairs'], [user ? '/account' : '/login', 'user', user ? 'Account' : 'Sign in']];
+    const nav = [['/', 'home', 'Home'], ['/search', 'search', 'Search'], ['/repairs', 'wrench', 'Repairs'],
+        ...(user?.role === 'customer' ? [['/orders', 'bag', 'Orders']] : []),
+        [user ? (user.role === 'customer' ? '/account' : homeFor(user.role)) : '/login', 'user', user ? (user.role === 'customer' ? 'Account' : 'My portal') : 'Sign in']];
 
     return (
         <div className="min-h-screen pb-20 md:pb-0">
@@ -61,7 +63,7 @@ export function PublicLayout() {
                     <div className="space-y-2"><p className="font-semibold text-slate-900">Help</p><Link to="/support" className="block hover:text-brand-700">Support & complaints</Link>{meta?.settings?.support_email && <a className="block hover:text-brand-700" href={`mailto:${meta.settings.support_email}`}>{meta.settings.support_email}</a>}</div>
                 </div>
             </footer>
-            <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden" aria-label="Main">
+            <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden [&>a]:flex-1" aria-label="Main">
                 {nav.map(([to, icon, t]) => (
                     <NavLink key={t} to={to} end={to === '/'} className={({ isActive }) => `flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${isActive ? 'text-brand-700' : 'text-slate-500'}`}>
                         <Icon name={icon} className="h-5 w-5" />{t}
@@ -81,11 +83,13 @@ export function RequireAuth({ roles, children }) {
     return children || <Outlet />;
 }
 
+// `tabs`: the sections shown in the phone bottom bar (everything else is under "More").
 const PORTALS = {
-    merchant: { title: 'Merchant', nav: [['', 'chart', 'Dashboard'], ['products', 'box', 'Products'], ['orders', 'bag', 'Orders'], ['enquiries', 'message', 'Enquiries'], ['reports', 'list', 'Reports'], ['settlements', 'rupee', 'Settlements'], ['shop', 'store', 'Shop profile']] },
-    technician: { title: 'Technician', nav: [['', 'chart', 'Dashboard'], ['repairs', 'wrench', 'Repair jobs'], ['reports', 'list', 'Reports'], ['profile', 'user', 'Profile']] },
+    merchant: { title: 'Shop', tabs: ['', 'products', 'orders', 'enquiries'], nav: [['', 'home', 'Home'], ['products', 'box', 'Products'], ['orders', 'bag', 'Orders'], ['enquiries', 'message', 'Enquiries'], ['reports', 'chart', 'Reports'], ['settlements', 'rupee', 'Settlements'], ['shop', 'store', 'Shop profile']] },
+    technician: { title: 'Technician', tabs: ['', 'repairs', 'reports'], nav: [['', 'home', 'Home'], ['repairs', 'wrench', 'Jobs'], ['reports', 'chart', 'Reports'], ['profile', 'user', 'Profile']] },
     admin: {
         title: 'Admin',
+        tabs: ['', 'tickets', 'orders', 'shops'],
         nav: [['', 'chart', 'Dashboard'], ['shops', 'store', 'Shops'], ['technicians', 'wrench', 'Technicians'], ['users', 'user', 'Users'], ['products', 'box', 'Listings'], ['orders', 'bag', 'Orders'], ['repairs', 'tool', 'Repairs'],
             ['tickets', 'ticket', 'Complaints'], ['reviews', 'star', 'Reviews'], ['refunds', 'refresh', 'Refunds'], ['settlements', 'rupee', 'Settlements'], ['commissions', 'rupee', 'Commission'],
             ['catalogue', 'list', 'Catalogue'], ['templates', 'message', 'Templates'], ['reports', 'chart', 'Reports'], ['searches', 'search', 'Search insights'], ['logs', 'shield', 'Audit log'], ['system-logs', 'file', 'System logs'], ['settings', 'settings', 'Settings'], ['account', 'user', 'My account']],
@@ -101,6 +105,10 @@ export function PortalLayout({ portal }) {
     const cfg = PORTALS[portal];
     useEffect(() => { setOpen(false); }, [loc.pathname]);
     const items = cfg.nav.filter(([p]) => !(portal === 'admin' && user?.role === 'support') || cfg.support.includes(p));
+    const tabs = items.filter(([p]) => cfg.tabs.includes(p)).slice(0, 4);
+    const more = items.filter((i) => !tabs.includes(i));
+    const to = (p) => `/${portal}${p ? '/' + p : ''}`;
+    const signOut = async () => { await logout(); navigate('/'); };
 
     const sidebar = (
         <nav className="space-y-0.5 p-3" aria-label={`${cfg.title} navigation`}>
@@ -126,28 +134,52 @@ export function PortalLayout({ portal }) {
                     </div>
                 </div>
             </aside>
+            {/* Phone "More" sheet */}
             {open && (
-                <div className="fixed inset-0 z-40 bg-slate-900/40 lg:hidden" onClick={() => setOpen(false)}>
-                    <div className="h-full w-72 overflow-y-auto bg-white" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex h-16 items-center border-b border-slate-100 px-4"><Logo /></div>
-                        {sidebar}
-                        <button onClick={async () => { await logout(); navigate('/'); }} className="mx-3 mb-6 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100"><Icon name="logout" className="h-4 w-4" />Sign out</button>
+                <div className="fixed inset-0 z-50 flex items-end bg-slate-900/40 lg:hidden" onClick={() => setOpen(false)}>
+                    <div className="max-h-[80vh] w-full overflow-y-auto rounded-t-3xl bg-white pb-[calc(env(safe-area-inset-bottom)+12px)] pt-2" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="More">
+                        <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-slate-200" />
+                        <div className="flex items-center gap-3 border-b border-slate-100 px-5 pb-3">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 font-bold text-brand-700">{user?.name?.[0]}</span>
+                            <span className="min-w-0"><span className="block truncate font-semibold text-slate-900">{user?.name}</span><span className="text-xs text-slate-500">{label(user?.role)} account</span></span>
+                        </div>
+                        <nav className="grid grid-cols-3 gap-2 p-4" aria-label="More sections">
+                            {more.map(([p, icon, t]) => (
+                                <NavLink key={p} to={to(p)} end={!p} className={({ isActive }) => `flex flex-col items-center gap-1.5 rounded-2xl p-3 text-center text-xs font-semibold ${isActive ? 'bg-brand-50 text-brand-700' : 'bg-slate-50 text-slate-700'}`}>
+                                    <Icon name={icon} className="h-5 w-5" />{t}
+                                </NavLink>
+                            ))}
+                            <Link to="/" className="flex flex-col items-center gap-1.5 rounded-2xl bg-slate-50 p-3 text-center text-xs font-semibold text-slate-700"><Icon name="store" className="h-5 w-5" />Marketplace</Link>
+                            <button onClick={signOut} className="flex flex-col items-center gap-1.5 rounded-2xl bg-red-50 p-3 text-center text-xs font-semibold text-red-700"><Icon name="logout" className="h-5 w-5" />Sign out</button>
+                        </nav>
                     </div>
                 </div>
             )}
-            <div className="min-w-0 flex-1">
-                <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur">
-                    <div className="flex items-center gap-2">
-                        <button className="rounded-xl p-2 text-slate-600 hover:bg-slate-100 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><Icon name="menu" /></button>
-                        <Badge tone="teal">{cfg.title} portal</Badge>
+            <div className="min-w-0 flex-1 pb-20 lg:pb-0">
+                <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-slate-200 bg-white/90 px-4 backdrop-blur lg:h-16">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                        <Link to={to('')} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white lg:hidden" aria-label="Portal home"><Icon name="smartphone" className="h-4 w-4" strokeWidth={2} /></Link>
+                        <span className="truncate text-sm font-bold text-slate-900">{cfg.title} portal</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Link to="/" className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">View marketplace</Link>
+                        <Link to="/" className="hidden rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:block">View marketplace</Link>
                         <NotificationBell />
                     </div>
                 </header>
-                <main className="mx-auto max-w-6xl px-4 py-6"><Outlet /></main>
+                <main className="mx-auto max-w-6xl px-4 py-5 lg:py-6"><Outlet /></main>
             </div>
+
+            {/* Phone bottom tab bar */}
+            <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label={`${cfg.title} sections`}>
+                {tabs.map(([p, icon, t]) => (
+                    <NavLink key={p} to={to(p)} end={!p} className={({ isActive }) => `flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${isActive ? 'text-brand-700' : 'text-slate-500'}`}>
+                        <Icon name={icon} className="h-5 w-5" />{t}
+                    </NavLink>
+                ))}
+                <button onClick={() => setOpen(true)} className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${more.some(([p]) => p && loc.pathname.startsWith(to(p))) ? 'text-brand-700' : 'text-slate-500'}`} aria-haspopup="dialog">
+                    <Icon name="menu" className="h-5 w-5" />More
+                </button>
+            </nav>
         </div>
     );
 }

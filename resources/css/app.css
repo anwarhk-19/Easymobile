@@ -24,6 +24,9 @@
     html { -webkit-tap-highlight-color: transparent; }
     body { @apply bg-slate-50 text-slate-800 antialiased; }
     :focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
+    /* Grid columns must be allowed to shrink, otherwise wide children (scrolling chip rows, tables)
+       push the whole layout past the screen edge on phones. */
+    .grid > * { min-width: 0; }
 }
 
 @layer components {

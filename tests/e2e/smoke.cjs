@@ -22,7 +22,8 @@ fs.mkdirSync(OUT, { recursive: true });
   }
   async function login(page, phone) {
     const r = await page.request.post(B + '/api/v1/auth/otp/send', { data: { phone }, headers: { Accept: 'application/json' } });
-    const code = (await r.json()).debug_code;
+    const sent = await r.json();
+    const code = sent.debug_code || process.env.E2E_TEST_OTP || '998001'; // dev-mode code, or the testing-phase master OTP
     const v = await page.request.post(B + '/api/v1/auth/otp/verify', { data: { phone, code }, headers: { Accept: 'application/json' } });
     const tok = (await v.json()).token;
     await page.goto(B + '/');

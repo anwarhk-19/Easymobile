@@ -28,6 +28,8 @@ class DashboardController extends MerchantController
                 'stale_stock_products' => (clone $products)->where('status', 'active')->where(fn ($q) => $q->whereNull('stock_confirmed_at')->orWhere('stock_confirmed_at', '<', now()->subDays($staleDays)))->count(),
                 'new_enquiries' => Enquiry::where('shop_id', $shop->id)->where('status', 'new')->count(),
                 'pending_orders' => (clone $orders)->whereIn('status', [Order::REQUESTED, Order::QUOTED, Order::ACCEPTED])->count(),
+                'orders_to_quote' => (clone $orders)->where('status', Order::REQUESTED)->count(),
+                'orders_to_confirm' => (clone $orders)->where('status', Order::ACCEPTED)->count(),
                 'confirmed_orders' => (clone $orders)->whereIn('status', [Order::CONFIRMED, Order::READY, Order::HANDED_OVER])->count(),
                 'completed_orders' => (clone $orders)->where('status', Order::COMPLETED)->count(),
                 'cancelled_orders' => (clone $orders)->whereIn('status', [Order::CANCELLED, Order::REJECTED])->count(),

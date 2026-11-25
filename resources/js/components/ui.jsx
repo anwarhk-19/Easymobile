@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './icons';
 import { STATUS, label, whatsappIcon } from '../lib/format';
@@ -52,7 +52,7 @@ export function CardGridSkeleton({ count = 8 }) {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="card overflow-hidden"><Skeleton className="aspect-square rounded-none" /><div className="space-y-2 p-3"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-4 w-1/2" /></div></div>
+                <div key={i} className="card overflow-hidden"><Skeleton className="aspect-[4/3] rounded-none" /><div className="space-y-2 p-3"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-4 w-1/2" /></div></div>
             ))}
         </div>
     );
@@ -135,7 +135,7 @@ export function Field({ label: text, error, hint, children, required, className 
     );
 }
 
-export const Input = ({ className = '', ...p }) => <input className={`input ${className}`} {...p} />;
+export const Input = forwardRef(({ className = '', ...p }, ref) => <input ref={ref} className={`input ${className}`} {...p} />);
 export const Textarea = ({ className = '', rows = 3, ...p }) => <textarea rows={rows} className={`input ${className}`} {...p} />;
 export function Select({ options = [], placeholder, className = '', ...p }) {
     return (

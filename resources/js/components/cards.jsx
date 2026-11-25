@@ -28,7 +28,7 @@ export function ProductCard({ product }) {
     return (
         <Link to={`/products/${product.slug}`} className="card group flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
             <div className="relative">
-                <ProductImage product={product} />
+                <ProductImage product={product} className="aspect-[4/3]" />
                 {product.availability !== 'in_stock' && <span className="absolute left-2 top-2"><StatusBadge status={product.availability} /></span>}
                 {discounted && <span className="absolute right-2 top-2 rounded-full bg-accent-500 px-2 py-0.5 text-[11px] font-bold text-slate-900">{Math.round((1 - product.discount_price / product.price) * 100)}% off</span>}
             </div>

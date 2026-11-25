@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import Icon from '../../components/icons';
 import DataTable from '../../components/DataTable';
-import { Alert, Async, Badge, Button, Checkbox, ConfirmDialog, DL, Field, Input, Modal, PageHeader, Section, Select, Stat, StatusBadge, Tabs, Textarea, Timeline, WhatsAppButton } from '../../components/ui';
+import { KpiStrip, ListCard, TodoList } from '../../components/portal';
+import { Alert, Async, Badge, Button, Checkbox, ConfirmDialog, DL, Field, Input, Modal, PageHeader, Section, Select, Skeleton, Stars, Stat, StatusBadge, Tabs, Textarea, Timeline, WhatsAppButton } from '../../components/ui';
 import NotFound from '../public/NotFound';
 import { DaysPicker, DocumentsInput, openPrivate } from '../merchant/ShopForm';
 import { DateRange, defaultRange } from '../merchant/Other';
@@ -29,33 +30,55 @@ export default function TechnicianRoutes() {
 
 const device = (r) => `${r.brand?.name || ''} ${r.phone_model?.name || r.device_model_text || ''}`.trim();
 
+/** What the technician has to do next, per job status. */
+const NEXT_STEP = {
+    submitted: 'Next: accept or decline', accepted: 'Next: diagnose & send a quote', diagnosing: 'Next: send the quotation', quote_rejected: 'Next: revise the quote or cancel',
+    approved: 'Next: start the repair', in_progress: 'Next: finish & run the test', testing: 'Next: record the test result', ready_for_handover: 'Next: hand over & complete',
+};
+
+function JobCard({ r }) {
+    return (
+        <ListCard to={`/technician/repairs/${r.id}`} title={`${device(r)} · ${r.repair_category.name}`} meta={`${r.customer?.name} · ${label(r.service_mode)} · ${ago(r.created_at)}`} status={<StatusBadge status={r.status} />}
+            footer={NEXT_STEP[r.status] && <span className="flex items-center justify-between text-sm font-semibold text-brand-700">{NEXT_STEP[r.status]}<Icon name="chevron" className="h-4 w-4" /></span>} />
+    );
+}
+
 function Dashboard() {
     const state = useApi('/technician/dashboard');
     if (state.error?.data?.code === 'profile_required') return <Navigate to="/technician/profile" replace />;
     return (
-        <Async state={state}>
+        <Async state={state} skeleton={<div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-40 w-full" /></div>}>
             {({ profile, stats: s, recent }) => (
                 <div className="space-y-5">
-                    <PageHeader title={profile.name} subtitle="Technician dashboard" actions={profile.status === 'approved' && <Button as={Link} variant="secondary" to={`/technicians/${profile.slug}`}>View public profile</Button>} />
+                    <div className="flex flex-wrap items-end justify-between gap-3">
+                        <div className="min-w-0">
+                            <p className="text-sm text-slate-500">Welcome back</p>
+                            <h1 className="truncate text-2xl font-extrabold tracking-tight text-slate-900">{profile.name}</h1>
+                            {profile.rating_count > 0 && <div className="mt-1"><Stars value={profile.rating_avg} count={profile.rating_count} size="h-3.5 w-3.5" /></div>}
+                        </div>
+                        {profile.status === 'approved' && <Button as={Link} variant="secondary" size="sm" to={`/technicians/${profile.slug}`}><Icon name="user" className="h-4 w-4" />Public profile</Button>}
+                    </div>
                     {profile.status === 'pending' && <Alert tone="amber" icon="clock" title="Profile under review">Customers can find you once our team approves your profile.</Alert>}
                     {['rejected', 'suspended'].includes(profile.status) && <Alert tone="red" title={`Profile ${profile.status}`}>{profile.rejection_reason}</Alert>}
-                    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <Stat label="New requests" value={s.new_requests} icon="bell" tone="amber" to="/technician/repairs?status=new" />
-                        <Stat label="Need quotation" value={s.awaiting_quote} icon="list" tone="blue" to="/technician/repairs" />
-                        <Stat label="Awaiting approval" value={s.awaiting_approval} icon="clock" tone="slate" />
-                        <Stat label="In progress" value={s.in_progress} icon="wrench" tone="brand" />
-                        <Stat label="Ready for handover" value={s.ready_for_handover} icon="check" tone="green" />
-                        <Stat label="Completed (month)" value={s.completed_this_month} icon="check" tone="green" />
-                        <Stat label="Revenue (month)" value={money(s.revenue_this_month)} icon="rupee" />
-                        <Stat label="Rating" value={s.rating_count ? `${Number(s.rating_avg).toFixed(1)} ★` : '—'} hint={`${s.rating_count} reviews`} icon="star" tone="amber" />
-                    </div>
-                    <Section title="Open jobs" action={<Link className="text-sm font-semibold text-brand-700" to="/technician/repairs">All jobs</Link>}>
-                        {recent.length === 0 ? <p className="text-sm text-slate-500">No open jobs right now.</p> : (
-                            <ul className="divide-y divide-slate-100">{recent.map((r) => (
-                                <li key={r.id}><Link to={`/technician/repairs/${r.id}`} className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-brand-700"><span><b>{device(r)}</b> · {r.repair_category.name}<span className="block text-xs text-slate-400">{r.reference} · {r.customer?.name} · {ago(r.created_at)}</span></span><StatusBadge status={r.status} /></Link></li>
-                            ))}</ul>
-                        )}
-                    </Section>
+
+                    <TodoList done="No jobs waiting on you right now." items={[
+                        { to: '/technician/repairs?status=new', icon: 'bell', tone: 'amber', count: s.new_requests, label: 'New repair requests', hint: 'Accept or decline' },
+                        { to: '/technician/repairs', icon: 'list', tone: 'blue', count: s.awaiting_quote, label: 'Jobs needing a quotation', hint: 'Diagnose and send the price' },
+                        { to: '/technician/repairs', icon: 'wrench', tone: 'brand', count: s.in_progress, label: 'Repairs in progress', hint: 'Approved — keep the customer updated' },
+                        { to: '/technician/repairs', icon: 'check', tone: 'green', count: s.ready_for_handover, label: 'Ready for handover', hint: 'Hand over and complete the job' },
+                    ]} />
+
+                    <KpiStrip items={[
+                        ['Awaiting customer', s.awaiting_approval],
+                        ['Completed this month', s.completed_this_month],
+                        ['Revenue this month', money(s.revenue_this_month)],
+                        ['All completed', s.completed],
+                    ]} />
+
+                    <section>
+                        <div className="mb-2 flex items-center justify-between"><h2 className="font-bold text-slate-900">Open jobs</h2><Link className="text-sm font-semibold text-brand-700" to="/technician/repairs">All jobs</Link></div>
+                        {recent.length === 0 ? <p className="card p-4 text-sm text-slate-500">No open jobs right now.</p> : <div className="grid gap-2.5 lg:grid-cols-2">{recent.map((r) => <JobCard key={r.id} r={r} />)}</div>}
+                    </section>
                 </div>
             )}
         </Async>
@@ -71,7 +94,7 @@ function RepairList() {
         <div>
             <PageHeader title="Repair jobs" />
             <Tabs className="mb-4" value={status} onChange={(s) => { setStatus(s); setPage(1); }} tabs={[['new', 'New'], ['active', 'Active'], ['closed', 'Closed'], ['', 'All']]} />
-            <DataTable state={state} onPage={setPage} empty="No jobs here" emptyIcon="wrench" onRowClick={(r) => navigate(`/technician/repairs/${r.id}`)} columns={[
+            <DataTable state={state} onPage={setPage} empty="No jobs here" emptyIcon="wrench" onRowClick={(r) => navigate(`/technician/repairs/${r.id}`)} card={(r) => <JobCard r={r} />} columns={[
                 { key: 'reference', label: 'Job', render: (r) => <><b>{r.reference}</b><span className="block text-xs text-slate-400">{ago(r.created_at)}</span></> },
                 { key: 'device', label: 'Device', render: (r) => device(r) }, { key: 'cat', label: 'Repair', render: (r) => r.repair_category.name },
                 { key: 'mode', label: 'Mode', render: (r) => label(r.service_mode) }, { key: 'customer', label: 'Customer', render: (r) => r.customer?.name },

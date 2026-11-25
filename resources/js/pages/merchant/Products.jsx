@@ -48,10 +48,30 @@ export function Products() {
 
     return (
         <div>
-            <PageHeader title="Products" actions={<><Button variant="secondary" busy={confirmAll.busy} onClick={() => confirmAll.run()}><Icon name="check" className="h-4 w-4" />Confirm all stock</Button><Button as={Link} to="/merchant/products/new"><Icon name="plus" className="h-4 w-4" />Add product</Button></>} />
-            <Tabs className="mb-3" value={status} onChange={(s) => { setParams(s ? { status: s } : {}); setPage(1); }} tabs={[['', 'All'], ['active', 'Active'], ['inactive', 'Inactive'], ['out_of_stock', 'Out of stock'], ['stale', 'Stock needs check'], ['suspended', 'Suspended']]} />
+            <PageHeader title="Products" actions={<><Button variant="secondary" size="sm" busy={confirmAll.busy} onClick={() => confirmAll.run()}><Icon name="check" className="h-4 w-4" />Confirm all stock</Button><Button as={Link} size="sm" to="/merchant/products/new"><Icon name="plus" className="h-4 w-4" />Add product</Button></>} />
+            <Tabs className="mb-3" value={status} onChange={(s) => { setParams(s ? { status: s } : {}); setPage(1); }} tabs={[['', 'All'], ['active', 'Active'], ['inactive', 'Hidden'], ['out_of_stock', 'Out of stock'], ['stale', 'Needs stock check'], ['suspended', 'Suspended']]} />
             <Toolbar><Input type="search" placeholder="Search name or SKU" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} /></Toolbar>
-            <DataTable state={state} onPage={setPage} empty="No products found" emptyIcon="box" columns={[
+            <DataTable state={state} onPage={setPage} empty="No products found" emptyIcon="box"
+                card={(p) => (
+                    <div className="card overflow-hidden">
+                        <Link to={`/merchant/products/${p.id}`} className="flex gap-3 p-3 active:bg-slate-50">
+                            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl"><ProductImage product={p} className="h-16" /></div>
+                            <div className="min-w-0 flex-1">
+                                <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-slate-900">{p.name}</p>
+                                <p className="mt-0.5 text-xs text-slate-500">{p.sku} · {p.category?.name}</p>
+                                <p className="mt-1 flex flex-wrap items-center gap-2"><b className="text-slate-900">{money(p.effective_price)}</b>{p.status !== 'active' && <StatusBadge status={p.status} />}{p.is_suspended && <Badge tone="red">Suspended</Badge>}</p>
+                            </div>
+                        </Link>
+                        <div className="border-t border-slate-100 px-3 py-2.5">
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-xs font-semibold text-slate-500">In stock</span>
+                                <StockStepper product={p} onSaved={state.reload} onConfirm={() => confirm.run(p.id)} />
+                            </div>
+                            <div className="mt-1.5 flex flex-wrap items-center gap-2"><StatusBadge status={p.availability} /><Freshness freshness={p.stock_freshness} /></div>
+                        </div>
+                    </div>
+                )}
+                columns={[
                 { key: 'name', label: 'Product', render: (p) => (
                     <div className="flex min-w-56 items-center gap-3"><div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg"><ProductImage product={p} className="h-12" /></div>
                         <div><Link to={`/merchant/products/${p.id}`} className="font-semibold text-slate-900 hover:text-brand-700">{p.name}</Link><p className="text-xs text-slate-500">{p.sku} · {p.category?.name}</p>{p.is_suspended && <Badge tone="red">Suspended: {p.suspension_reason}</Badge>}</div></div>) },
@@ -61,6 +81,28 @@ export function Products() {
                 { key: 'actions', label: '', render: (p) => <div className="flex gap-1.5"><Button size="sm" variant="secondary" onClick={() => setStockFor(p)}>Update stock</Button><Button size="sm" variant="ghost" onClick={() => confirm.run(p.id)} title="Stock is still accurate">Confirm</Button></div> },
             ]} />
             {stockFor && <StockModal product={stockFor} onClose={() => setStockFor(null)} onDone={() => { setStockFor(null); state.reload(); }} />}
+        </div>
+    );
+}
+
+/** − qty + stepper: change the count with taps, then Save. Unchanged → "Still correct" refreshes stock freshness. */
+function StockStepper({ product, onSaved, onConfirm }) {
+    const toast = useToast();
+    const [qty, setQty] = useState(product.stock_quantity);
+    useEffect(() => { setQty(product.stock_quantity); }, [product.stock_quantity]);
+    const changed = qty !== product.stock_quantity;
+    const save = useAction(() => post(`/merchant/products/${product.id}/stock`, { quantity: qty, reason: qty > product.stock_quantity ? 'restock' : 'sale_offline' }),
+        { onSuccess: () => { toast(`Stock updated to ${qty}`); onSaved(); }, onError: (e) => toast(e.message, 'error') });
+    return (
+        <div className="flex shrink-0 items-center gap-2">
+            <div className="flex items-center rounded-xl border border-slate-300 bg-white">
+                <button type="button" className="px-3 py-2 text-lg font-bold text-slate-600 disabled:opacity-30" onClick={() => setQty((q) => Math.max(0, q - 1))} disabled={qty <= 0} aria-label={`One less ${product.name}`}>−</button>
+                <span className="min-w-8 text-center font-bold tabular-nums text-slate-900" aria-live="polite">{qty}</span>
+                <button type="button" className="px-3 py-2 text-lg font-bold text-slate-600" onClick={() => setQty((q) => q + 1)} aria-label={`One more ${product.name}`}>+</button>
+            </div>
+            {changed
+                ? <Button size="sm" busy={save.busy} onClick={() => save.run()}>Save</Button>
+                : <Button size="sm" variant="ghost" onClick={onConfirm} title="Stock count is still correct">Still correct</Button>}
         </div>
     );
 }
